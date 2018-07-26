@@ -1,0 +1,73 @@
+##
+# Server configuration
+##
+server:
+  servlet:
+    context-path: /api
+  port: 8080
+
+##
+# Spring configuration
+##
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/cmanager?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&zeroDateTimeBehavior=convertToNull
+    username: root
+    password:
+    driver-class-name: com.mysql.jdbc.Driver
+    dialect: org.hibernate.dialect.MySQL5Dialect
+    test-on-borrow: true
+    validation-query: SELECT 1
+  jpa:
+    open-in-view: true
+    generate-ddl: true
+    hibernate.ddl-auto: create
+    properties:
+      javax:
+        persistence:
+          schema-generation:
+            create-source: metadata
+            scripts:
+              action: create
+              create-target: create.sql
+  mail:
+    host: localhost
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        smtp:
+          port: 1025
+          auth: false
+      support:
+        from: admin@ladislas-gabriel.fr
+        to: contact@ladislas-gabriel.fr
+
+##
+# Logging
+##
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        type:
+          descriptor:
+            sql: trace
+##
+# Security
+##
+#auth:
+#  jwt:
+#    audience: Cmanager
+#    issuer: https://auth0.cmanager.com
+#    expiration: 3600000
+#  key:
+#      public: C:/Dev/ssl/publickey.cer
+#      private: C:/Dev/ssl/privatekey.pkcs8
+#    pwd:
+#      iterations: 200
+#      key-length: 127
+#      salt-length: 127
+#      hex-length: 16
+#      digest: PBKDF2WithHmacSHA1
