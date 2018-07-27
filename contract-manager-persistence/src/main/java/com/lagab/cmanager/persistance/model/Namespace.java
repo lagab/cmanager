@@ -4,8 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.lagab.cmanager.persistance.resolver.EntityIdResolver;
+import org.hibernate.annotations.NaturalId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -16,6 +19,7 @@ import java.util.Date;
  */
 @Access(AccessType.PROPERTY)
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "namespace")
 public class Namespace{
 
@@ -32,7 +36,7 @@ public class Namespace{
     private User owner;
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "id")
     public Long getId() {
         return id;
@@ -52,8 +56,8 @@ public class Namespace{
         this.name = name;
     }
 
-   
-    @Column(name = "path")
+    @NaturalId
+    @Column(name = "path",nullable = false, unique = true)
     public String getPath() {
         return path;
     }
@@ -143,9 +147,10 @@ public class Namespace{
             (
             generator=ObjectIdGenerators.PropertyGenerator.class,
             property="id",
+            resolver = EntityIdResolver.class,
             scope = User.class
     )
-    //@JsonIdentityReference(alwaysAsId=true)
+    @JsonIdentityReference(alwaysAsId=true)
     @JsonDeserialize(as = User.class)
     public User getOwner() {
         return owner;
@@ -164,18 +169,6 @@ public class Namespace{
         Namespace namespace = (Namespace) o;
 
         if (id != null ? !id.equals(namespace.id) : namespace.id != null) return false;
-        if (name != null ? !name.equals(namespace.name) : namespace.name != null) return false;
-        if (path != null ? !path.equals(namespace.path) : namespace.path != null) return false;
-        if (createdAt != null ? !createdAt.equals(namespace.createdAt) : namespace.createdAt != null) return false;
-        if (updatedAt != null ? !updatedAt.equals(namespace.updatedAt) : namespace.updatedAt != null) return false;
-        if (type != null ? !type.equals(namespace.type) : namespace.type != null) return false;
-        if (description != null ? !description.equals(namespace.description) : namespace.description != null)
-            return false;
-        if (avatar != null ? !avatar.equals(namespace.avatar) : namespace.avatar != null) return false;
-        if (visibilityLevel != null ? !visibilityLevel.equals(namespace.visibilityLevel) : namespace.visibilityLevel != null)
-            return false;
-        if (requestAcess != null ? !requestAcess.equals(namespace.requestAcess) : namespace.requestAcess != null)
-            return false;
 
         return true;
     }
@@ -184,15 +177,6 @@ public class Namespace{
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + (id != null ? id.hashCode() : 0);
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (path != null ? path.hashCode() : 0);
-        result = 31 * result + (createdAt != null ? createdAt.hashCode() : 0);
-        result = 31 * result + (updatedAt != null ? updatedAt.hashCode() : 0);
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (avatar != null ? avatar.hashCode() : 0);
-        result = 31 * result + (visibilityLevel != null ? visibilityLevel.hashCode() : 0);
-        result = 31 * result + (requestAcess != null ? requestAcess.hashCode() : 0);
         return result;
     }
 

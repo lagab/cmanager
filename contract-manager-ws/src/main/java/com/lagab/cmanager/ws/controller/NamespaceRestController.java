@@ -6,13 +6,21 @@ package com.lagab.cmanager.ws.controller;
  */
 import com.lagab.cmanager.persistance.model.Namespace;
 import com.lagab.cmanager.persistance.repository.NamespaceRepository;
-import com.lagab.cmanager.ws.exception.NamespaceNotFoundException;
+import com.lagab.cmanager.ws.exception.NotFoundException;
+import com.lagab.cmanager.ws.util.PathPattern;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.persistence.criteria.Predicate;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/namespaces")
@@ -26,7 +34,7 @@ public class NamespaceRestController {
     }
 
     @GetMapping
-    public  Iterable<Namespace> getAllNamespaces() {
+    public  Iterable<Namespace> findAll() {
         // This returns a JSON or XML with the users
 
         /*namespaceRepository.findAll((root, query, builder) -> {
@@ -39,11 +47,34 @@ public class NamespaceRestController {
         return namespaceRepository.findAll();
     }
     @RequestMapping(path = "s/{slug}")
-    public Namespace showNamespace(@PathVariable("slug") String slug){
+    public Namespace get(@PathVariable("slug") String slug){
         return namespaceRepository.findByPath(slug);
     }
-    @RequestMapping(path = "{id}")
-    public Namespace getNamespace(@PathVariable("id") Integer id){
-        return namespaceRepository.findById(id.longValue()).orElseThrow(NamespaceNotFoundException::new);
+    @RequestMapping(path = "/{id:" + PathPattern.ID_PATTERN + "}", method = RequestMethod.GET)
+    public Namespace get(@PathVariable("id") Integer id){
+        return namespaceRepository.findById(id.longValue()).orElseThrow(() -> new NotFoundException(Namespace.class, id));
+    }
+    @RequestMapping(path = "/{id:" + PathPattern.ID_PATTERN + "}", method = RequestMethod.PUT)
+    public Namespace update(@PathVariable Long id, @RequestBody Namespace namespace){
+        Optional<Namespace> namespaceOptional = namespaceRepository.findById(id);
+        if(!namespaceOptional.isPresent()){
+            return  null;
+        }
+        Namespace currentNamespace = namespaceOptional.get();
+        currentNamespace.setName(namespace.getName());
+        currentNamespace.setDescription(namespace.getDescription());
+        namespace.setId(id);
+        namespace.setCreatedAt(currentNamespace.getCreatedAt());
+        return namespaceRepository.save(namespace);
+
+        //return namespaceRepository.findById(id.longValue()).orElseThrow(NamespaceNotFoundException::new);
+    }
+    @RequestMapping(method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Object> createNamespace(@RequestBody Namespace namespace, HttpServletRequest request, HttpServletResponse response){
+        Namespace namespaceCreated = namespaceRepository.save(namespace);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/" + namespaceCreated.getId()).build().toUri();
+        System.out.println(uri);
+        return ResponseEntity.created(uri).build();
     }
 }
