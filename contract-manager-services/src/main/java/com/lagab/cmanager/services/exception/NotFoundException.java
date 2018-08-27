@@ -1,4 +1,4 @@
-package com.lagab.cmanager.ws.exception;
+package com.lagab.cmanager.services.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

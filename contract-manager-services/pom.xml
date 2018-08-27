@@ -18,6 +18,7 @@
             <artifactId>contract-manager-persistence</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+
     </dependencies>
 
 </project>
