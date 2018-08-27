@@ -15,7 +15,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * @since 12/07/2018.
  */
 @SpringBootApplication(scanBasePackages = {
-        "com.lagab.cmanager.ws"
+        "com.lagab.cmanager.ws",
+        "com.lagab.cmanager.services"
 })
 @EntityScan(basePackages = {
         "com.lagab.cmanager.persistance.model"

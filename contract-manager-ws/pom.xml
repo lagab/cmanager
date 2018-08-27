@@ -21,13 +21,14 @@
         <dependency>
             <groupId>com.lagab.cmanager</groupId>
             <artifactId>contract-manager-persistence</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.parent.version}</version>
         </dependency>
-        <!--<dependency>
-            <groupId>com.humanis</groupId>
+        <!-- Services -->
+        <dependency>
+            <groupId>com.lagab.cmanager</groupId>
             <artifactId>contract-manager-services</artifactId>
             <version>${project.parent.version}</version>
-        </dependency>-->
+        </dependency>
 
         <!-- Security -->
 <!--
