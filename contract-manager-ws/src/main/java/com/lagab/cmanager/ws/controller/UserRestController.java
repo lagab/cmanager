@@ -6,6 +6,7 @@ package com.lagab.cmanager.ws.controller;
  */
 import com.lagab.cmanager.persistance.model.User;
 import com.lagab.cmanager.services.UserService;
+import com.lagab.cmanager.ws.specification.Like;
 import com.lagab.cmanager.ws.util.PathPattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -45,8 +46,8 @@ public class UserRestController extends AbstractCrudController<User,Long>  {
 
 
     @GetMapping
-    public Page<User> findAll(Specification specification, Pageable pageable) {
-        return userService.findAll(specification, pageable);
+    public Iterable<User> findAll() {
+        return userService.findAll();
     }
 
     @RequestMapping(path = "/{id:" + PathPattern.ID_PATTERN + "}", method = RequestMethod.GET)
