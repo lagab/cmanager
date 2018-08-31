@@ -5,7 +5,7 @@
       "nativeLanguage": "en"
     },
     "jhipsterVersion": "5.2.1",
-    "applicationType": "microservice",
+    "applicationType": "monolith",
     "baseName": "cmanager",
     "packageName": "com.lagab.cmanager",
     "packageFolder": "com/lagab/cmanager",
@@ -35,6 +35,6 @@
       "fr"
     ],
     "skipClient": true,
-    "skipUserManagement": true
+    "skipUserManagement": false
   }
 }
