@@ -1,0 +1,110 @@
+enum Visibility {
+    PRIVATE, PROTECTED, PUBLIC
+}
+enum AccessLevel {
+    MASTER, OWNER, GUEST, REPORTER, DEV
+}
+enum Status {
+    ANY, DRAFT, PENDING, CANCELED, DECLINED, EXPIRED, SIGNED, COMPLETED, VIEWED
+}
+enum Gender {
+    UNKNOW, MALE, FEMALE
+}
+/**
+ * Workpace entity.
+ * @author The JHipster team.
+ */
+ entity Workspace {
+	name String required,
+    slug String required,
+    description String,
+    avatar String,
+    requestAcess Boolean,
+    visibility Visibility
+}
+relationship OneToMany {
+    Workspace{projects} to Project{workspace}
+}
+
+entity Project{
+	name String required,
+    path String required
+    visibility Visibility,
+    archived Boolean required
+}
+relationship OneToMany {
+    Project{contracts} to Contract{project}
+}
+
+ entity Contract {
+ 	uuid String required,
+	name String required,
+    subject String required,
+    status Status,
+    description String,
+    content String,
+    requestAcess Boolean,
+    lastActivityAt LocalDate required,
+    expiresAt LocalDate,
+    type String
+}
+relationship OneToMany {
+    Contract{requests} to SignatureRequest{contract}
+}
+entity SignatureRequest {
+	requesterEmail String required,
+    title String required,
+    subject String,
+    message String,
+    ccEmail String,
+}
+
+relationship OneToMany {
+    SignatureRequest{signatures} to Signature{request}
+}
+entity Signature {
+	email String required,
+    name String required,
+    order Integer required,
+    status Status,
+    declineReason String,
+	lastViewedAt LocalDate required,
+    lastRemindedAt LocalDate required,
+}
+
+// Contacts Management
+entity ContactFolder {
+	name String required
+}
+relationship OneToMany {
+    Project{contactFolders} to ContactFolder{project}
+}
+relationship OneToMany {
+    ContactFolder{lists} to ContactList{folder}
+}
+
+entity ContactList {
+	name String required,
+    description String
+}
+
+relationship OneToMany {
+    ContactList{contacts} to Contact{list}
+}
+entity Contact {
+	email String required,
+    gender Gender,
+    fullName String,
+    lastName String,
+    firstName String,
+    attributes String,
+}
+
+
+// Set pagination options
+paginate * with pagination
+
+dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl
