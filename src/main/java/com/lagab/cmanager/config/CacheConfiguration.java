@@ -38,6 +38,22 @@ public class CacheConfiguration {
             cm.createCache(com.lagab.cmanager.domain.User.class.getName(), jcacheConfiguration);
             cm.createCache(com.lagab.cmanager.domain.Authority.class.getName(), jcacheConfiguration);
             cm.createCache(com.lagab.cmanager.domain.User.class.getName() + ".authorities", jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.Workspace.class.getName(), jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.Workspace.class.getName() + ".projects", jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.Project.class.getName(), jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.Project.class.getName() + ".contracts", jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.Project.class.getName() + ".contactFolders", jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.Contract.class.getName(), jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.Contract.class.getName() + ".requests", jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.SignatureRequest.class.getName(), jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.SignatureRequest.class.getName() + ".signatures", jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.Signature.class.getName(), jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.ContactFolder.class.getName(), jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.ContactFolder.class.getName() + ".lists", jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.ContactList.class.getName(), jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.ContactList.class.getName() + ".contacts", jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.Contact.class.getName(), jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.EntityAuditEvent.class.getName(), jcacheConfiguration);
             // jhipster-needle-ehcache-add-entry
         };
     }

@@ -1,0 +1,55 @@
+{
+    "name": "Workspace",
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "slug",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "description",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "avatar",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "requestAcess",
+            "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "visibility",
+            "fieldType": "Visibility",
+            "fieldValues": "PRIVATE,PROTECTED,PUBLIC"
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "projects",
+            "otherEntityName": "project",
+            "otherEntityRelationshipName": "workspace"
+        }
+    ],
+    "changelogDate": "20180906154751",
+    "javadoc": "Workpace entity.\n@author The JHipster team.",
+    "entityTableName": "workspace",
+    "dto": "mapstruct",
+    "pagination": "pagination",
+    "service": "serviceImpl",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*",
+    "enableEntityAudit": true
+}

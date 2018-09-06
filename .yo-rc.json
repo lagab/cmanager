@@ -36,5 +36,8 @@
     ],
     "skipClient": true,
     "skipUserManagement": false
+  },
+  "generator-jhipster-entity-audit": {
+    "auditFramework": "custom"
   }
 }

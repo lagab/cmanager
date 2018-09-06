@@ -1,0 +1,55 @@
+{
+    "name": "SignatureRequest",
+    "fields": [
+        {
+            "fieldName": "requesterEmail",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "title",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "subject",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "message",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "ccEmail",
+            "fieldType": "String"
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "signatures",
+            "otherEntityName": "signature",
+            "otherEntityRelationshipName": "request"
+        },
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "contract",
+            "otherEntityName": "contract",
+            "otherEntityField": "id"
+        }
+    ],
+    "changelogDate": "20180906154754",
+    "entityTableName": "signature_request",
+    "dto": "mapstruct",
+    "pagination": "pagination",
+    "service": "serviceImpl",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*",
+    "enableEntityAudit": true
+}
