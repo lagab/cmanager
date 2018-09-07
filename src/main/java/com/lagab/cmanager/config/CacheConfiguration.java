@@ -54,6 +54,8 @@ public class CacheConfiguration {
             cm.createCache(com.lagab.cmanager.domain.ContactList.class.getName() + ".contacts", jcacheConfiguration);
             cm.createCache(com.lagab.cmanager.domain.Contact.class.getName(), jcacheConfiguration);
             cm.createCache(com.lagab.cmanager.domain.EntityAuditEvent.class.getName(), jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.Attachment.class.getName(), jcacheConfiguration);
+            cm.createCache(com.lagab.cmanager.domain.Attachment.class.getName() + ".tests", jcacheConfiguration);
             // jhipster-needle-ehcache-add-entry
         };
     }
