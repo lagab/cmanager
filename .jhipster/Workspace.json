@@ -44,7 +44,7 @@
     "changelogDate": "20180906154751",
     "javadoc": "Workpace entity.\n@author The JHipster team.",
     "entityTableName": "workspace",
-    "dto": "mapstruct",
+    "dto": "no",
     "pagination": "pagination",
     "service": "serviceImpl",
     "jpaMetamodelFiltering": false,

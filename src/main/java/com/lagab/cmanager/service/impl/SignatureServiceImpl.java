@@ -3,8 +3,6 @@ package com.lagab.cmanager.service.impl;
 import com.lagab.cmanager.service.SignatureService;
 import com.lagab.cmanager.domain.Signature;
 import com.lagab.cmanager.repository.SignatureRepository;
-import com.lagab.cmanager.service.dto.SignatureDTO;
-import com.lagab.cmanager.service.mapper.SignatureMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,25 +24,19 @@ public class SignatureServiceImpl implements SignatureService {
 
     private final SignatureRepository signatureRepository;
 
-    private final SignatureMapper signatureMapper;
-
-    public SignatureServiceImpl(SignatureRepository signatureRepository, SignatureMapper signatureMapper) {
+    public SignatureServiceImpl(SignatureRepository signatureRepository) {
         this.signatureRepository = signatureRepository;
-        this.signatureMapper = signatureMapper;
     }
 
     /**
      * Save a signature.
      *
-     * @param signatureDTO the entity to save
+     * @param signature the entity to save
      * @return the persisted entity
      */
     @Override
-    public SignatureDTO save(SignatureDTO signatureDTO) {
-        log.debug("Request to save Signature : {}", signatureDTO);
-        Signature signature = signatureMapper.toEntity(signatureDTO);
-        signature = signatureRepository.save(signature);
-        return signatureMapper.toDto(signature);
+    public Signature save(Signature signature) {
+        log.debug("Request to save Signature : {}", signature);        return signatureRepository.save(signature);
     }
 
     /**
@@ -55,10 +47,9 @@ public class SignatureServiceImpl implements SignatureService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<SignatureDTO> findAll(Pageable pageable) {
+    public Page<Signature> findAll(Pageable pageable) {
         log.debug("Request to get all Signatures");
-        return signatureRepository.findAll(pageable)
-            .map(signatureMapper::toDto);
+        return signatureRepository.findAll(pageable);
     }
 
 
@@ -70,10 +61,9 @@ public class SignatureServiceImpl implements SignatureService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Optional<SignatureDTO> findOne(Long id) {
+    public Optional<Signature> findOne(Long id) {
         log.debug("Request to get Signature : {}", id);
-        return signatureRepository.findById(id)
-            .map(signatureMapper::toDto);
+        return signatureRepository.findById(id);
     }
 
     /**

@@ -3,8 +3,6 @@ package com.lagab.cmanager.service.impl;
 import com.lagab.cmanager.service.ContactListService;
 import com.lagab.cmanager.domain.ContactList;
 import com.lagab.cmanager.repository.ContactListRepository;
-import com.lagab.cmanager.service.dto.ContactListDTO;
-import com.lagab.cmanager.service.mapper.ContactListMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,25 +24,19 @@ public class ContactListServiceImpl implements ContactListService {
 
     private final ContactListRepository contactListRepository;
 
-    private final ContactListMapper contactListMapper;
-
-    public ContactListServiceImpl(ContactListRepository contactListRepository, ContactListMapper contactListMapper) {
+    public ContactListServiceImpl(ContactListRepository contactListRepository) {
         this.contactListRepository = contactListRepository;
-        this.contactListMapper = contactListMapper;
     }
 
     /**
      * Save a contactList.
      *
-     * @param contactListDTO the entity to save
+     * @param contactList the entity to save
      * @return the persisted entity
      */
     @Override
-    public ContactListDTO save(ContactListDTO contactListDTO) {
-        log.debug("Request to save ContactList : {}", contactListDTO);
-        ContactList contactList = contactListMapper.toEntity(contactListDTO);
-        contactList = contactListRepository.save(contactList);
-        return contactListMapper.toDto(contactList);
+    public ContactList save(ContactList contactList) {
+        log.debug("Request to save ContactList : {}", contactList);        return contactListRepository.save(contactList);
     }
 
     /**
@@ -55,10 +47,9 @@ public class ContactListServiceImpl implements ContactListService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<ContactListDTO> findAll(Pageable pageable) {
+    public Page<ContactList> findAll(Pageable pageable) {
         log.debug("Request to get all ContactLists");
-        return contactListRepository.findAll(pageable)
-            .map(contactListMapper::toDto);
+        return contactListRepository.findAll(pageable);
     }
 
 
@@ -70,10 +61,9 @@ public class ContactListServiceImpl implements ContactListService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Optional<ContactListDTO> findOne(Long id) {
+    public Optional<ContactList> findOne(Long id) {
         log.debug("Request to get ContactList : {}", id);
-        return contactListRepository.findById(id)
-            .map(contactListMapper::toDto);
+        return contactListRepository.findById(id);
     }
 
     /**

@@ -5,8 +5,6 @@ import com.lagab.cmanager.CmanagerApp;
 import com.lagab.cmanager.domain.ContactFolder;
 import com.lagab.cmanager.repository.ContactFolderRepository;
 import com.lagab.cmanager.service.ContactFolderService;
-import com.lagab.cmanager.service.dto.ContactFolderDTO;
-import com.lagab.cmanager.service.mapper.ContactFolderMapper;
 import com.lagab.cmanager.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -48,9 +46,6 @@ public class ContactFolderResourceIntTest {
     @Autowired
     private ContactFolderRepository contactFolderRepository;
 
-
-    @Autowired
-    private ContactFolderMapper contactFolderMapper;
     
 
     @Autowired
@@ -106,10 +101,9 @@ public class ContactFolderResourceIntTest {
         int databaseSizeBeforeCreate = contactFolderRepository.findAll().size();
 
         // Create the ContactFolder
-        ContactFolderDTO contactFolderDTO = contactFolderMapper.toDto(contactFolder);
         restContactFolderMockMvc.perform(post("/api/contact-folders")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contactFolderDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contactFolder)))
             .andExpect(status().isCreated());
 
         // Validate the ContactFolder in the database
@@ -126,12 +120,11 @@ public class ContactFolderResourceIntTest {
 
         // Create the ContactFolder with an existing ID
         contactFolder.setId(1L);
-        ContactFolderDTO contactFolderDTO = contactFolderMapper.toDto(contactFolder);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restContactFolderMockMvc.perform(post("/api/contact-folders")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contactFolderDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contactFolder)))
             .andExpect(status().isBadRequest());
 
         // Validate the ContactFolder in the database
@@ -147,11 +140,10 @@ public class ContactFolderResourceIntTest {
         contactFolder.setName(null);
 
         // Create the ContactFolder, which fails.
-        ContactFolderDTO contactFolderDTO = contactFolderMapper.toDto(contactFolder);
 
         restContactFolderMockMvc.perform(post("/api/contact-folders")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contactFolderDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contactFolder)))
             .andExpect(status().isBadRequest());
 
         List<ContactFolder> contactFolderList = contactFolderRepository.findAll();
@@ -198,7 +190,7 @@ public class ContactFolderResourceIntTest {
     @Transactional
     public void updateContactFolder() throws Exception {
         // Initialize the database
-        contactFolderRepository.saveAndFlush(contactFolder);
+        contactFolderService.save(contactFolder);
 
         int databaseSizeBeforeUpdate = contactFolderRepository.findAll().size();
 
@@ -208,11 +200,10 @@ public class ContactFolderResourceIntTest {
         em.detach(updatedContactFolder);
         updatedContactFolder
             .name(UPDATED_NAME);
-        ContactFolderDTO contactFolderDTO = contactFolderMapper.toDto(updatedContactFolder);
 
         restContactFolderMockMvc.perform(put("/api/contact-folders")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contactFolderDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(updatedContactFolder)))
             .andExpect(status().isOk());
 
         // Validate the ContactFolder in the database
@@ -228,12 +219,11 @@ public class ContactFolderResourceIntTest {
         int databaseSizeBeforeUpdate = contactFolderRepository.findAll().size();
 
         // Create the ContactFolder
-        ContactFolderDTO contactFolderDTO = contactFolderMapper.toDto(contactFolder);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException 
         restContactFolderMockMvc.perform(put("/api/contact-folders")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contactFolderDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contactFolder)))
             .andExpect(status().isBadRequest());
 
         // Validate the ContactFolder in the database
@@ -245,7 +235,7 @@ public class ContactFolderResourceIntTest {
     @Transactional
     public void deleteContactFolder() throws Exception {
         // Initialize the database
-        contactFolderRepository.saveAndFlush(contactFolder);
+        contactFolderService.save(contactFolder);
 
         int databaseSizeBeforeDelete = contactFolderRepository.findAll().size();
 
@@ -272,28 +262,5 @@ public class ContactFolderResourceIntTest {
         assertThat(contactFolder1).isNotEqualTo(contactFolder2);
         contactFolder1.setId(null);
         assertThat(contactFolder1).isNotEqualTo(contactFolder2);
-    }
-
-    @Test
-    @Transactional
-    public void dtoEqualsVerifier() throws Exception {
-        TestUtil.equalsVerifier(ContactFolderDTO.class);
-        ContactFolderDTO contactFolderDTO1 = new ContactFolderDTO();
-        contactFolderDTO1.setId(1L);
-        ContactFolderDTO contactFolderDTO2 = new ContactFolderDTO();
-        assertThat(contactFolderDTO1).isNotEqualTo(contactFolderDTO2);
-        contactFolderDTO2.setId(contactFolderDTO1.getId());
-        assertThat(contactFolderDTO1).isEqualTo(contactFolderDTO2);
-        contactFolderDTO2.setId(2L);
-        assertThat(contactFolderDTO1).isNotEqualTo(contactFolderDTO2);
-        contactFolderDTO1.setId(null);
-        assertThat(contactFolderDTO1).isNotEqualTo(contactFolderDTO2);
-    }
-
-    @Test
-    @Transactional
-    public void testEntityFromId() {
-        assertThat(contactFolderMapper.fromId(42L).getId()).isEqualTo(42);
-        assertThat(contactFolderMapper.fromId(null)).isNull();
     }
 }

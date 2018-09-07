@@ -1,6 +1,6 @@
 package com.lagab.cmanager.service;
 
-import com.lagab.cmanager.service.dto.SignatureDTO;
+import com.lagab.cmanager.domain.Signature;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +15,10 @@ public interface SignatureService {
     /**
      * Save a signature.
      *
-     * @param signatureDTO the entity to save
+     * @param signature the entity to save
      * @return the persisted entity
      */
-    SignatureDTO save(SignatureDTO signatureDTO);
+    Signature save(Signature signature);
 
     /**
      * Get all the signatures.
@@ -26,7 +26,7 @@ public interface SignatureService {
      * @param pageable the pagination information
      * @return the list of entities
      */
-    Page<SignatureDTO> findAll(Pageable pageable);
+    Page<Signature> findAll(Pageable pageable);
 
 
     /**
@@ -35,7 +35,7 @@ public interface SignatureService {
      * @param id the id of the entity
      * @return the entity
      */
-    Optional<SignatureDTO> findOne(Long id);
+    Optional<Signature> findOne(Long id);
 
     /**
      * Delete the "id" signature.

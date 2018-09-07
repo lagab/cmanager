@@ -5,8 +5,6 @@ import com.lagab.cmanager.CmanagerApp;
 import com.lagab.cmanager.domain.Signature;
 import com.lagab.cmanager.repository.SignatureRepository;
 import com.lagab.cmanager.service.SignatureService;
-import com.lagab.cmanager.service.dto.SignatureDTO;
-import com.lagab.cmanager.service.mapper.SignatureMapper;
 import com.lagab.cmanager.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -69,9 +67,6 @@ public class SignatureResourceIntTest {
     @Autowired
     private SignatureRepository signatureRepository;
 
-
-    @Autowired
-    private SignatureMapper signatureMapper;
     
 
     @Autowired
@@ -133,10 +128,9 @@ public class SignatureResourceIntTest {
         int databaseSizeBeforeCreate = signatureRepository.findAll().size();
 
         // Create the Signature
-        SignatureDTO signatureDTO = signatureMapper.toDto(signature);
         restSignatureMockMvc.perform(post("/api/signatures")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(signature)))
             .andExpect(status().isCreated());
 
         // Validate the Signature in the database
@@ -159,12 +153,11 @@ public class SignatureResourceIntTest {
 
         // Create the Signature with an existing ID
         signature.setId(1L);
-        SignatureDTO signatureDTO = signatureMapper.toDto(signature);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restSignatureMockMvc.perform(post("/api/signatures")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(signature)))
             .andExpect(status().isBadRequest());
 
         // Validate the Signature in the database
@@ -180,11 +173,10 @@ public class SignatureResourceIntTest {
         signature.setEmail(null);
 
         // Create the Signature, which fails.
-        SignatureDTO signatureDTO = signatureMapper.toDto(signature);
 
         restSignatureMockMvc.perform(post("/api/signatures")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(signature)))
             .andExpect(status().isBadRequest());
 
         List<Signature> signatureList = signatureRepository.findAll();
@@ -199,11 +191,10 @@ public class SignatureResourceIntTest {
         signature.setName(null);
 
         // Create the Signature, which fails.
-        SignatureDTO signatureDTO = signatureMapper.toDto(signature);
 
         restSignatureMockMvc.perform(post("/api/signatures")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(signature)))
             .andExpect(status().isBadRequest());
 
         List<Signature> signatureList = signatureRepository.findAll();
@@ -218,11 +209,10 @@ public class SignatureResourceIntTest {
         signature.setOrder(null);
 
         // Create the Signature, which fails.
-        SignatureDTO signatureDTO = signatureMapper.toDto(signature);
 
         restSignatureMockMvc.perform(post("/api/signatures")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(signature)))
             .andExpect(status().isBadRequest());
 
         List<Signature> signatureList = signatureRepository.findAll();
@@ -237,11 +227,10 @@ public class SignatureResourceIntTest {
         signature.setLastViewedAt(null);
 
         // Create the Signature, which fails.
-        SignatureDTO signatureDTO = signatureMapper.toDto(signature);
 
         restSignatureMockMvc.perform(post("/api/signatures")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(signature)))
             .andExpect(status().isBadRequest());
 
         List<Signature> signatureList = signatureRepository.findAll();
@@ -256,11 +245,10 @@ public class SignatureResourceIntTest {
         signature.setLastRemindedAt(null);
 
         // Create the Signature, which fails.
-        SignatureDTO signatureDTO = signatureMapper.toDto(signature);
 
         restSignatureMockMvc.perform(post("/api/signatures")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(signature)))
             .andExpect(status().isBadRequest());
 
         List<Signature> signatureList = signatureRepository.findAll();
@@ -319,7 +307,7 @@ public class SignatureResourceIntTest {
     @Transactional
     public void updateSignature() throws Exception {
         // Initialize the database
-        signatureRepository.saveAndFlush(signature);
+        signatureService.save(signature);
 
         int databaseSizeBeforeUpdate = signatureRepository.findAll().size();
 
@@ -335,11 +323,10 @@ public class SignatureResourceIntTest {
             .declineReason(UPDATED_DECLINE_REASON)
             .lastViewedAt(UPDATED_LAST_VIEWED_AT)
             .lastRemindedAt(UPDATED_LAST_REMINDED_AT);
-        SignatureDTO signatureDTO = signatureMapper.toDto(updatedSignature);
 
         restSignatureMockMvc.perform(put("/api/signatures")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(updatedSignature)))
             .andExpect(status().isOk());
 
         // Validate the Signature in the database
@@ -361,12 +348,11 @@ public class SignatureResourceIntTest {
         int databaseSizeBeforeUpdate = signatureRepository.findAll().size();
 
         // Create the Signature
-        SignatureDTO signatureDTO = signatureMapper.toDto(signature);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException 
         restSignatureMockMvc.perform(put("/api/signatures")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(signature)))
             .andExpect(status().isBadRequest());
 
         // Validate the Signature in the database
@@ -378,7 +364,7 @@ public class SignatureResourceIntTest {
     @Transactional
     public void deleteSignature() throws Exception {
         // Initialize the database
-        signatureRepository.saveAndFlush(signature);
+        signatureService.save(signature);
 
         int databaseSizeBeforeDelete = signatureRepository.findAll().size();
 
@@ -405,28 +391,5 @@ public class SignatureResourceIntTest {
         assertThat(signature1).isNotEqualTo(signature2);
         signature1.setId(null);
         assertThat(signature1).isNotEqualTo(signature2);
-    }
-
-    @Test
-    @Transactional
-    public void dtoEqualsVerifier() throws Exception {
-        TestUtil.equalsVerifier(SignatureDTO.class);
-        SignatureDTO signatureDTO1 = new SignatureDTO();
-        signatureDTO1.setId(1L);
-        SignatureDTO signatureDTO2 = new SignatureDTO();
-        assertThat(signatureDTO1).isNotEqualTo(signatureDTO2);
-        signatureDTO2.setId(signatureDTO1.getId());
-        assertThat(signatureDTO1).isEqualTo(signatureDTO2);
-        signatureDTO2.setId(2L);
-        assertThat(signatureDTO1).isNotEqualTo(signatureDTO2);
-        signatureDTO1.setId(null);
-        assertThat(signatureDTO1).isNotEqualTo(signatureDTO2);
-    }
-
-    @Test
-    @Transactional
-    public void testEntityFromId() {
-        assertThat(signatureMapper.fromId(42L).getId()).isEqualTo(42);
-        assertThat(signatureMapper.fromId(null)).isNull();
     }
 }

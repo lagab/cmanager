@@ -1,11 +1,11 @@
 package com.lagab.cmanager.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.lagab.cmanager.domain.Contact;
 import com.lagab.cmanager.service.ContactService;
 import com.lagab.cmanager.web.rest.errors.BadRequestAlertException;
 import com.lagab.cmanager.web.rest.util.HeaderUtil;
 import com.lagab.cmanager.web.rest.util.PaginationUtil;
-import com.lagab.cmanager.service.dto.ContactDTO;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,18 +43,18 @@ public class ContactResource {
     /**
      * POST  /contacts : Create a new contact.
      *
-     * @param contactDTO the contactDTO to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new contactDTO, or with status 400 (Bad Request) if the contact has already an ID
+     * @param contact the contact to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new contact, or with status 400 (Bad Request) if the contact has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/contacts")
     @Timed
-    public ResponseEntity<ContactDTO> createContact(@Valid @RequestBody ContactDTO contactDTO) throws URISyntaxException {
-        log.debug("REST request to save Contact : {}", contactDTO);
-        if (contactDTO.getId() != null) {
+    public ResponseEntity<Contact> createContact(@Valid @RequestBody Contact contact) throws URISyntaxException {
+        log.debug("REST request to save Contact : {}", contact);
+        if (contact.getId() != null) {
             throw new BadRequestAlertException("A new contact cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        ContactDTO result = contactService.save(contactDTO);
+        Contact result = contactService.save(contact);
         return ResponseEntity.created(new URI("/api/contacts/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -63,22 +63,22 @@ public class ContactResource {
     /**
      * PUT  /contacts : Updates an existing contact.
      *
-     * @param contactDTO the contactDTO to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated contactDTO,
-     * or with status 400 (Bad Request) if the contactDTO is not valid,
-     * or with status 500 (Internal Server Error) if the contactDTO couldn't be updated
+     * @param contact the contact to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated contact,
+     * or with status 400 (Bad Request) if the contact is not valid,
+     * or with status 500 (Internal Server Error) if the contact couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/contacts")
     @Timed
-    public ResponseEntity<ContactDTO> updateContact(@Valid @RequestBody ContactDTO contactDTO) throws URISyntaxException {
-        log.debug("REST request to update Contact : {}", contactDTO);
-        if (contactDTO.getId() == null) {
+    public ResponseEntity<Contact> updateContact(@Valid @RequestBody Contact contact) throws URISyntaxException {
+        log.debug("REST request to update Contact : {}", contact);
+        if (contact.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        ContactDTO result = contactService.save(contactDTO);
+        Contact result = contactService.save(contact);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, contactDTO.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, contact.getId().toString()))
             .body(result);
     }
 
@@ -90,9 +90,9 @@ public class ContactResource {
      */
     @GetMapping("/contacts")
     @Timed
-    public ResponseEntity<List<ContactDTO>> getAllContacts(Pageable pageable) {
+    public ResponseEntity<List<Contact>> getAllContacts(Pageable pageable) {
         log.debug("REST request to get a page of Contacts");
-        Page<ContactDTO> page = contactService.findAll(pageable);
+        Page<Contact> page = contactService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/contacts");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -100,21 +100,21 @@ public class ContactResource {
     /**
      * GET  /contacts/:id : get the "id" contact.
      *
-     * @param id the id of the contactDTO to retrieve
-     * @return the ResponseEntity with status 200 (OK) and with body the contactDTO, or with status 404 (Not Found)
+     * @param id the id of the contact to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the contact, or with status 404 (Not Found)
      */
     @GetMapping("/contacts/{id}")
     @Timed
-    public ResponseEntity<ContactDTO> getContact(@PathVariable Long id) {
+    public ResponseEntity<Contact> getContact(@PathVariable Long id) {
         log.debug("REST request to get Contact : {}", id);
-        Optional<ContactDTO> contactDTO = contactService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(contactDTO);
+        Optional<Contact> contact = contactService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(contact);
     }
 
     /**
      * DELETE  /contacts/:id : delete the "id" contact.
      *
-     * @param id the id of the contactDTO to delete
+     * @param id the id of the contact to delete
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/contacts/{id}")

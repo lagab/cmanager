@@ -50,7 +50,7 @@
     ],
     "changelogDate": "20180906154752",
     "entityTableName": "project",
-    "dto": "mapstruct",
+    "dto": "no",
     "pagination": "pagination",
     "service": "serviceImpl",
     "jpaMetamodelFiltering": false,

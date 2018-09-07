@@ -5,8 +5,6 @@ import com.lagab.cmanager.CmanagerApp;
 import com.lagab.cmanager.domain.Workspace;
 import com.lagab.cmanager.repository.WorkspaceRepository;
 import com.lagab.cmanager.service.WorkspaceService;
-import com.lagab.cmanager.service.dto.WorkspaceDTO;
-import com.lagab.cmanager.service.mapper.WorkspaceMapper;
 import com.lagab.cmanager.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -64,9 +62,6 @@ public class WorkspaceResourceIntTest {
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
-
-    @Autowired
-    private WorkspaceMapper workspaceMapper;
     
 
     @Autowired
@@ -127,10 +122,9 @@ public class WorkspaceResourceIntTest {
         int databaseSizeBeforeCreate = workspaceRepository.findAll().size();
 
         // Create the Workspace
-        WorkspaceDTO workspaceDTO = workspaceMapper.toDto(workspace);
         restWorkspaceMockMvc.perform(post("/api/workspaces")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(workspaceDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(workspace)))
             .andExpect(status().isCreated());
 
         // Validate the Workspace in the database
@@ -152,12 +146,11 @@ public class WorkspaceResourceIntTest {
 
         // Create the Workspace with an existing ID
         workspace.setId(1L);
-        WorkspaceDTO workspaceDTO = workspaceMapper.toDto(workspace);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restWorkspaceMockMvc.perform(post("/api/workspaces")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(workspaceDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(workspace)))
             .andExpect(status().isBadRequest());
 
         // Validate the Workspace in the database
@@ -173,11 +166,10 @@ public class WorkspaceResourceIntTest {
         workspace.setName(null);
 
         // Create the Workspace, which fails.
-        WorkspaceDTO workspaceDTO = workspaceMapper.toDto(workspace);
 
         restWorkspaceMockMvc.perform(post("/api/workspaces")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(workspaceDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(workspace)))
             .andExpect(status().isBadRequest());
 
         List<Workspace> workspaceList = workspaceRepository.findAll();
@@ -192,11 +184,10 @@ public class WorkspaceResourceIntTest {
         workspace.setSlug(null);
 
         // Create the Workspace, which fails.
-        WorkspaceDTO workspaceDTO = workspaceMapper.toDto(workspace);
 
         restWorkspaceMockMvc.perform(post("/api/workspaces")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(workspaceDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(workspace)))
             .andExpect(status().isBadRequest());
 
         List<Workspace> workspaceList = workspaceRepository.findAll();
@@ -253,7 +244,7 @@ public class WorkspaceResourceIntTest {
     @Transactional
     public void updateWorkspace() throws Exception {
         // Initialize the database
-        workspaceRepository.saveAndFlush(workspace);
+        workspaceService.save(workspace);
 
         int databaseSizeBeforeUpdate = workspaceRepository.findAll().size();
 
@@ -268,11 +259,10 @@ public class WorkspaceResourceIntTest {
             .avatar(UPDATED_AVATAR)
             .requestAcess(UPDATED_REQUEST_ACESS)
             .visibility(UPDATED_VISIBILITY);
-        WorkspaceDTO workspaceDTO = workspaceMapper.toDto(updatedWorkspace);
 
         restWorkspaceMockMvc.perform(put("/api/workspaces")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(workspaceDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(updatedWorkspace)))
             .andExpect(status().isOk());
 
         // Validate the Workspace in the database
@@ -293,12 +283,11 @@ public class WorkspaceResourceIntTest {
         int databaseSizeBeforeUpdate = workspaceRepository.findAll().size();
 
         // Create the Workspace
-        WorkspaceDTO workspaceDTO = workspaceMapper.toDto(workspace);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException 
         restWorkspaceMockMvc.perform(put("/api/workspaces")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(workspaceDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(workspace)))
             .andExpect(status().isBadRequest());
 
         // Validate the Workspace in the database
@@ -310,7 +299,7 @@ public class WorkspaceResourceIntTest {
     @Transactional
     public void deleteWorkspace() throws Exception {
         // Initialize the database
-        workspaceRepository.saveAndFlush(workspace);
+        workspaceService.save(workspace);
 
         int databaseSizeBeforeDelete = workspaceRepository.findAll().size();
 
@@ -337,28 +326,5 @@ public class WorkspaceResourceIntTest {
         assertThat(workspace1).isNotEqualTo(workspace2);
         workspace1.setId(null);
         assertThat(workspace1).isNotEqualTo(workspace2);
-    }
-
-    @Test
-    @Transactional
-    public void dtoEqualsVerifier() throws Exception {
-        TestUtil.equalsVerifier(WorkspaceDTO.class);
-        WorkspaceDTO workspaceDTO1 = new WorkspaceDTO();
-        workspaceDTO1.setId(1L);
-        WorkspaceDTO workspaceDTO2 = new WorkspaceDTO();
-        assertThat(workspaceDTO1).isNotEqualTo(workspaceDTO2);
-        workspaceDTO2.setId(workspaceDTO1.getId());
-        assertThat(workspaceDTO1).isEqualTo(workspaceDTO2);
-        workspaceDTO2.setId(2L);
-        assertThat(workspaceDTO1).isNotEqualTo(workspaceDTO2);
-        workspaceDTO1.setId(null);
-        assertThat(workspaceDTO1).isNotEqualTo(workspaceDTO2);
-    }
-
-    @Test
-    @Transactional
-    public void testEntityFromId() {
-        assertThat(workspaceMapper.fromId(42L).getId()).isEqualTo(42);
-        assertThat(workspaceMapper.fromId(null)).isNull();
     }
 }

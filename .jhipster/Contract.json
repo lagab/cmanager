@@ -71,7 +71,7 @@
     ],
     "changelogDate": "20180906154753",
     "entityTableName": "contract",
-    "dto": "mapstruct",
+    "dto": "no",
     "pagination": "pagination",
     "service": "serviceImpl",
     "jpaMetamodelFiltering": false,

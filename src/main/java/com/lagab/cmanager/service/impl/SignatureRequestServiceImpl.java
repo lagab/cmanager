@@ -3,8 +3,6 @@ package com.lagab.cmanager.service.impl;
 import com.lagab.cmanager.service.SignatureRequestService;
 import com.lagab.cmanager.domain.SignatureRequest;
 import com.lagab.cmanager.repository.SignatureRequestRepository;
-import com.lagab.cmanager.service.dto.SignatureRequestDTO;
-import com.lagab.cmanager.service.mapper.SignatureRequestMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,25 +24,19 @@ public class SignatureRequestServiceImpl implements SignatureRequestService {
 
     private final SignatureRequestRepository signatureRequestRepository;
 
-    private final SignatureRequestMapper signatureRequestMapper;
-
-    public SignatureRequestServiceImpl(SignatureRequestRepository signatureRequestRepository, SignatureRequestMapper signatureRequestMapper) {
+    public SignatureRequestServiceImpl(SignatureRequestRepository signatureRequestRepository) {
         this.signatureRequestRepository = signatureRequestRepository;
-        this.signatureRequestMapper = signatureRequestMapper;
     }
 
     /**
      * Save a signatureRequest.
      *
-     * @param signatureRequestDTO the entity to save
+     * @param signatureRequest the entity to save
      * @return the persisted entity
      */
     @Override
-    public SignatureRequestDTO save(SignatureRequestDTO signatureRequestDTO) {
-        log.debug("Request to save SignatureRequest : {}", signatureRequestDTO);
-        SignatureRequest signatureRequest = signatureRequestMapper.toEntity(signatureRequestDTO);
-        signatureRequest = signatureRequestRepository.save(signatureRequest);
-        return signatureRequestMapper.toDto(signatureRequest);
+    public SignatureRequest save(SignatureRequest signatureRequest) {
+        log.debug("Request to save SignatureRequest : {}", signatureRequest);        return signatureRequestRepository.save(signatureRequest);
     }
 
     /**
@@ -55,10 +47,9 @@ public class SignatureRequestServiceImpl implements SignatureRequestService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<SignatureRequestDTO> findAll(Pageable pageable) {
+    public Page<SignatureRequest> findAll(Pageable pageable) {
         log.debug("Request to get all SignatureRequests");
-        return signatureRequestRepository.findAll(pageable)
-            .map(signatureRequestMapper::toDto);
+        return signatureRequestRepository.findAll(pageable);
     }
 
 
@@ -70,10 +61,9 @@ public class SignatureRequestServiceImpl implements SignatureRequestService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Optional<SignatureRequestDTO> findOne(Long id) {
+    public Optional<SignatureRequest> findOne(Long id) {
         log.debug("Request to get SignatureRequest : {}", id);
-        return signatureRequestRepository.findById(id)
-            .map(signatureRequestMapper::toDto);
+        return signatureRequestRepository.findById(id);
     }
 
     /**

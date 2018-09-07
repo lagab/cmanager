@@ -56,7 +56,7 @@
     ],
     "changelogDate": "20180906154755",
     "entityTableName": "signature",
-    "dto": "mapstruct",
+    "dto": "no",
     "pagination": "pagination",
     "service": "serviceImpl",
     "jpaMetamodelFiltering": false,

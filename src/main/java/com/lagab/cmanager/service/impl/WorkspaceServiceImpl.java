@@ -3,8 +3,6 @@ package com.lagab.cmanager.service.impl;
 import com.lagab.cmanager.service.WorkspaceService;
 import com.lagab.cmanager.domain.Workspace;
 import com.lagab.cmanager.repository.WorkspaceRepository;
-import com.lagab.cmanager.service.dto.WorkspaceDTO;
-import com.lagab.cmanager.service.mapper.WorkspaceMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,25 +24,19 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     private final WorkspaceRepository workspaceRepository;
 
-    private final WorkspaceMapper workspaceMapper;
-
-    public WorkspaceServiceImpl(WorkspaceRepository workspaceRepository, WorkspaceMapper workspaceMapper) {
+    public WorkspaceServiceImpl(WorkspaceRepository workspaceRepository) {
         this.workspaceRepository = workspaceRepository;
-        this.workspaceMapper = workspaceMapper;
     }
 
     /**
      * Save a workspace.
      *
-     * @param workspaceDTO the entity to save
+     * @param workspace the entity to save
      * @return the persisted entity
      */
     @Override
-    public WorkspaceDTO save(WorkspaceDTO workspaceDTO) {
-        log.debug("Request to save Workspace : {}", workspaceDTO);
-        Workspace workspace = workspaceMapper.toEntity(workspaceDTO);
-        workspace = workspaceRepository.save(workspace);
-        return workspaceMapper.toDto(workspace);
+    public Workspace save(Workspace workspace) {
+        log.debug("Request to save Workspace : {}", workspace);        return workspaceRepository.save(workspace);
     }
 
     /**
@@ -55,10 +47,9 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<WorkspaceDTO> findAll(Pageable pageable) {
+    public Page<Workspace> findAll(Pageable pageable) {
         log.debug("Request to get all Workspaces");
-        return workspaceRepository.findAll(pageable)
-            .map(workspaceMapper::toDto);
+        return workspaceRepository.findAll(pageable);
     }
 
 
@@ -70,10 +61,9 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Optional<WorkspaceDTO> findOne(Long id) {
+    public Optional<Workspace> findOne(Long id) {
         log.debug("Request to get Workspace : {}", id);
-        return workspaceRepository.findById(id)
-            .map(workspaceMapper::toDto);
+        return workspaceRepository.findById(id);
     }
 
     /**

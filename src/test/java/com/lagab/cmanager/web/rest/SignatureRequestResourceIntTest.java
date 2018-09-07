@@ -5,8 +5,6 @@ import com.lagab.cmanager.CmanagerApp;
 import com.lagab.cmanager.domain.SignatureRequest;
 import com.lagab.cmanager.repository.SignatureRequestRepository;
 import com.lagab.cmanager.service.SignatureRequestService;
-import com.lagab.cmanager.service.dto.SignatureRequestDTO;
-import com.lagab.cmanager.service.mapper.SignatureRequestMapper;
 import com.lagab.cmanager.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -60,9 +58,6 @@ public class SignatureRequestResourceIntTest {
     @Autowired
     private SignatureRequestRepository signatureRequestRepository;
 
-
-    @Autowired
-    private SignatureRequestMapper signatureRequestMapper;
     
 
     @Autowired
@@ -122,10 +117,9 @@ public class SignatureRequestResourceIntTest {
         int databaseSizeBeforeCreate = signatureRequestRepository.findAll().size();
 
         // Create the SignatureRequest
-        SignatureRequestDTO signatureRequestDTO = signatureRequestMapper.toDto(signatureRequest);
         restSignatureRequestMockMvc.perform(post("/api/signature-requests")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureRequestDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(signatureRequest)))
             .andExpect(status().isCreated());
 
         // Validate the SignatureRequest in the database
@@ -146,12 +140,11 @@ public class SignatureRequestResourceIntTest {
 
         // Create the SignatureRequest with an existing ID
         signatureRequest.setId(1L);
-        SignatureRequestDTO signatureRequestDTO = signatureRequestMapper.toDto(signatureRequest);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restSignatureRequestMockMvc.perform(post("/api/signature-requests")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureRequestDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(signatureRequest)))
             .andExpect(status().isBadRequest());
 
         // Validate the SignatureRequest in the database
@@ -167,11 +160,10 @@ public class SignatureRequestResourceIntTest {
         signatureRequest.setRequesterEmail(null);
 
         // Create the SignatureRequest, which fails.
-        SignatureRequestDTO signatureRequestDTO = signatureRequestMapper.toDto(signatureRequest);
 
         restSignatureRequestMockMvc.perform(post("/api/signature-requests")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureRequestDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(signatureRequest)))
             .andExpect(status().isBadRequest());
 
         List<SignatureRequest> signatureRequestList = signatureRequestRepository.findAll();
@@ -186,11 +178,10 @@ public class SignatureRequestResourceIntTest {
         signatureRequest.setTitle(null);
 
         // Create the SignatureRequest, which fails.
-        SignatureRequestDTO signatureRequestDTO = signatureRequestMapper.toDto(signatureRequest);
 
         restSignatureRequestMockMvc.perform(post("/api/signature-requests")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureRequestDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(signatureRequest)))
             .andExpect(status().isBadRequest());
 
         List<SignatureRequest> signatureRequestList = signatureRequestRepository.findAll();
@@ -245,7 +236,7 @@ public class SignatureRequestResourceIntTest {
     @Transactional
     public void updateSignatureRequest() throws Exception {
         // Initialize the database
-        signatureRequestRepository.saveAndFlush(signatureRequest);
+        signatureRequestService.save(signatureRequest);
 
         int databaseSizeBeforeUpdate = signatureRequestRepository.findAll().size();
 
@@ -259,11 +250,10 @@ public class SignatureRequestResourceIntTest {
             .subject(UPDATED_SUBJECT)
             .message(UPDATED_MESSAGE)
             .ccEmail(UPDATED_CC_EMAIL);
-        SignatureRequestDTO signatureRequestDTO = signatureRequestMapper.toDto(updatedSignatureRequest);
 
         restSignatureRequestMockMvc.perform(put("/api/signature-requests")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureRequestDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(updatedSignatureRequest)))
             .andExpect(status().isOk());
 
         // Validate the SignatureRequest in the database
@@ -283,12 +273,11 @@ public class SignatureRequestResourceIntTest {
         int databaseSizeBeforeUpdate = signatureRequestRepository.findAll().size();
 
         // Create the SignatureRequest
-        SignatureRequestDTO signatureRequestDTO = signatureRequestMapper.toDto(signatureRequest);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException 
         restSignatureRequestMockMvc.perform(put("/api/signature-requests")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(signatureRequestDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(signatureRequest)))
             .andExpect(status().isBadRequest());
 
         // Validate the SignatureRequest in the database
@@ -300,7 +289,7 @@ public class SignatureRequestResourceIntTest {
     @Transactional
     public void deleteSignatureRequest() throws Exception {
         // Initialize the database
-        signatureRequestRepository.saveAndFlush(signatureRequest);
+        signatureRequestService.save(signatureRequest);
 
         int databaseSizeBeforeDelete = signatureRequestRepository.findAll().size();
 
@@ -327,28 +316,5 @@ public class SignatureRequestResourceIntTest {
         assertThat(signatureRequest1).isNotEqualTo(signatureRequest2);
         signatureRequest1.setId(null);
         assertThat(signatureRequest1).isNotEqualTo(signatureRequest2);
-    }
-
-    @Test
-    @Transactional
-    public void dtoEqualsVerifier() throws Exception {
-        TestUtil.equalsVerifier(SignatureRequestDTO.class);
-        SignatureRequestDTO signatureRequestDTO1 = new SignatureRequestDTO();
-        signatureRequestDTO1.setId(1L);
-        SignatureRequestDTO signatureRequestDTO2 = new SignatureRequestDTO();
-        assertThat(signatureRequestDTO1).isNotEqualTo(signatureRequestDTO2);
-        signatureRequestDTO2.setId(signatureRequestDTO1.getId());
-        assertThat(signatureRequestDTO1).isEqualTo(signatureRequestDTO2);
-        signatureRequestDTO2.setId(2L);
-        assertThat(signatureRequestDTO1).isNotEqualTo(signatureRequestDTO2);
-        signatureRequestDTO1.setId(null);
-        assertThat(signatureRequestDTO1).isNotEqualTo(signatureRequestDTO2);
-    }
-
-    @Test
-    @Transactional
-    public void testEntityFromId() {
-        assertThat(signatureRequestMapper.fromId(42L).getId()).isEqualTo(42);
-        assertThat(signatureRequestMapper.fromId(null)).isNull();
     }
 }

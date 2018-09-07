@@ -104,7 +104,5 @@ entity Contact {
 // Set pagination options
 paginate * with pagination
 
-dto * with mapstruct
-
 // Set service options to all except few
 service all with serviceImpl

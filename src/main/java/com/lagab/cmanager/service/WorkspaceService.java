@@ -1,6 +1,6 @@
 package com.lagab.cmanager.service;
 
-import com.lagab.cmanager.service.dto.WorkspaceDTO;
+import com.lagab.cmanager.domain.Workspace;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +15,10 @@ public interface WorkspaceService {
     /**
      * Save a workspace.
      *
-     * @param workspaceDTO the entity to save
+     * @param workspace the entity to save
      * @return the persisted entity
      */
-    WorkspaceDTO save(WorkspaceDTO workspaceDTO);
+    Workspace save(Workspace workspace);
 
     /**
      * Get all the workspaces.
@@ -26,7 +26,7 @@ public interface WorkspaceService {
      * @param pageable the pagination information
      * @return the list of entities
      */
-    Page<WorkspaceDTO> findAll(Pageable pageable);
+    Page<Workspace> findAll(Pageable pageable);
 
 
     /**
@@ -35,7 +35,7 @@ public interface WorkspaceService {
      * @param id the id of the entity
      * @return the entity
      */
-    Optional<WorkspaceDTO> findOne(Long id);
+    Optional<Workspace> findOne(Long id);
 
     /**
      * Delete the "id" workspace.

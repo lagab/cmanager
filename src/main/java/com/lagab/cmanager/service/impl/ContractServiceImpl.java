@@ -3,8 +3,6 @@ package com.lagab.cmanager.service.impl;
 import com.lagab.cmanager.service.ContractService;
 import com.lagab.cmanager.domain.Contract;
 import com.lagab.cmanager.repository.ContractRepository;
-import com.lagab.cmanager.service.dto.ContractDTO;
-import com.lagab.cmanager.service.mapper.ContractMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,25 +24,19 @@ public class ContractServiceImpl implements ContractService {
 
     private final ContractRepository contractRepository;
 
-    private final ContractMapper contractMapper;
-
-    public ContractServiceImpl(ContractRepository contractRepository, ContractMapper contractMapper) {
+    public ContractServiceImpl(ContractRepository contractRepository) {
         this.contractRepository = contractRepository;
-        this.contractMapper = contractMapper;
     }
 
     /**
      * Save a contract.
      *
-     * @param contractDTO the entity to save
+     * @param contract the entity to save
      * @return the persisted entity
      */
     @Override
-    public ContractDTO save(ContractDTO contractDTO) {
-        log.debug("Request to save Contract : {}", contractDTO);
-        Contract contract = contractMapper.toEntity(contractDTO);
-        contract = contractRepository.save(contract);
-        return contractMapper.toDto(contract);
+    public Contract save(Contract contract) {
+        log.debug("Request to save Contract : {}", contract);        return contractRepository.save(contract);
     }
 
     /**
@@ -55,10 +47,9 @@ public class ContractServiceImpl implements ContractService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<ContractDTO> findAll(Pageable pageable) {
+    public Page<Contract> findAll(Pageable pageable) {
         log.debug("Request to get all Contracts");
-        return contractRepository.findAll(pageable)
-            .map(contractMapper::toDto);
+        return contractRepository.findAll(pageable);
     }
 
 
@@ -70,10 +61,9 @@ public class ContractServiceImpl implements ContractService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Optional<ContractDTO> findOne(Long id) {
+    public Optional<Contract> findOne(Long id) {
         log.debug("Request to get Contract : {}", id);
-        return contractRepository.findById(id)
-            .map(contractMapper::toDto);
+        return contractRepository.findById(id);
     }
 
     /**

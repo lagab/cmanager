@@ -29,7 +29,7 @@
     ],
     "changelogDate": "20180906154757",
     "entityTableName": "contact_list",
-    "dto": "mapstruct",
+    "dto": "no",
     "pagination": "pagination",
     "service": "serviceImpl",
     "jpaMetamodelFiltering": false,

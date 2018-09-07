@@ -3,8 +3,6 @@ package com.lagab.cmanager.service.impl;
 import com.lagab.cmanager.service.ProjectService;
 import com.lagab.cmanager.domain.Project;
 import com.lagab.cmanager.repository.ProjectRepository;
-import com.lagab.cmanager.service.dto.ProjectDTO;
-import com.lagab.cmanager.service.mapper.ProjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,25 +24,19 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
 
-    private final ProjectMapper projectMapper;
-
-    public ProjectServiceImpl(ProjectRepository projectRepository, ProjectMapper projectMapper) {
+    public ProjectServiceImpl(ProjectRepository projectRepository) {
         this.projectRepository = projectRepository;
-        this.projectMapper = projectMapper;
     }
 
     /**
      * Save a project.
      *
-     * @param projectDTO the entity to save
+     * @param project the entity to save
      * @return the persisted entity
      */
     @Override
-    public ProjectDTO save(ProjectDTO projectDTO) {
-        log.debug("Request to save Project : {}", projectDTO);
-        Project project = projectMapper.toEntity(projectDTO);
-        project = projectRepository.save(project);
-        return projectMapper.toDto(project);
+    public Project save(Project project) {
+        log.debug("Request to save Project : {}", project);        return projectRepository.save(project);
     }
 
     /**
@@ -55,10 +47,9 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectDTO> findAll(Pageable pageable) {
+    public Page<Project> findAll(Pageable pageable) {
         log.debug("Request to get all Projects");
-        return projectRepository.findAll(pageable)
-            .map(projectMapper::toDto);
+        return projectRepository.findAll(pageable);
     }
 
 
@@ -70,10 +61,9 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Optional<ProjectDTO> findOne(Long id) {
+    public Optional<Project> findOne(Long id) {
         log.debug("Request to get Project : {}", id);
-        return projectRepository.findById(id)
-            .map(projectMapper::toDto);
+        return projectRepository.findById(id);
     }
 
     /**

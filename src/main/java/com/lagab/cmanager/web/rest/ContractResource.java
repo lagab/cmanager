@@ -1,11 +1,11 @@
 package com.lagab.cmanager.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.lagab.cmanager.domain.Contract;
 import com.lagab.cmanager.service.ContractService;
 import com.lagab.cmanager.web.rest.errors.BadRequestAlertException;
 import com.lagab.cmanager.web.rest.util.HeaderUtil;
 import com.lagab.cmanager.web.rest.util.PaginationUtil;
-import com.lagab.cmanager.service.dto.ContractDTO;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,18 +43,18 @@ public class ContractResource {
     /**
      * POST  /contracts : Create a new contract.
      *
-     * @param contractDTO the contractDTO to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new contractDTO, or with status 400 (Bad Request) if the contract has already an ID
+     * @param contract the contract to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new contract, or with status 400 (Bad Request) if the contract has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/contracts")
     @Timed
-    public ResponseEntity<ContractDTO> createContract(@Valid @RequestBody ContractDTO contractDTO) throws URISyntaxException {
-        log.debug("REST request to save Contract : {}", contractDTO);
-        if (contractDTO.getId() != null) {
+    public ResponseEntity<Contract> createContract(@Valid @RequestBody Contract contract) throws URISyntaxException {
+        log.debug("REST request to save Contract : {}", contract);
+        if (contract.getId() != null) {
             throw new BadRequestAlertException("A new contract cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        ContractDTO result = contractService.save(contractDTO);
+        Contract result = contractService.save(contract);
         return ResponseEntity.created(new URI("/api/contracts/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -63,22 +63,22 @@ public class ContractResource {
     /**
      * PUT  /contracts : Updates an existing contract.
      *
-     * @param contractDTO the contractDTO to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated contractDTO,
-     * or with status 400 (Bad Request) if the contractDTO is not valid,
-     * or with status 500 (Internal Server Error) if the contractDTO couldn't be updated
+     * @param contract the contract to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated contract,
+     * or with status 400 (Bad Request) if the contract is not valid,
+     * or with status 500 (Internal Server Error) if the contract couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/contracts")
     @Timed
-    public ResponseEntity<ContractDTO> updateContract(@Valid @RequestBody ContractDTO contractDTO) throws URISyntaxException {
-        log.debug("REST request to update Contract : {}", contractDTO);
-        if (contractDTO.getId() == null) {
+    public ResponseEntity<Contract> updateContract(@Valid @RequestBody Contract contract) throws URISyntaxException {
+        log.debug("REST request to update Contract : {}", contract);
+        if (contract.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        ContractDTO result = contractService.save(contractDTO);
+        Contract result = contractService.save(contract);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, contractDTO.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, contract.getId().toString()))
             .body(result);
     }
 
@@ -90,9 +90,9 @@ public class ContractResource {
      */
     @GetMapping("/contracts")
     @Timed
-    public ResponseEntity<List<ContractDTO>> getAllContracts(Pageable pageable) {
+    public ResponseEntity<List<Contract>> getAllContracts(Pageable pageable) {
         log.debug("REST request to get a page of Contracts");
-        Page<ContractDTO> page = contractService.findAll(pageable);
+        Page<Contract> page = contractService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/contracts");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -100,21 +100,21 @@ public class ContractResource {
     /**
      * GET  /contracts/:id : get the "id" contract.
      *
-     * @param id the id of the contractDTO to retrieve
-     * @return the ResponseEntity with status 200 (OK) and with body the contractDTO, or with status 404 (Not Found)
+     * @param id the id of the contract to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the contract, or with status 404 (Not Found)
      */
     @GetMapping("/contracts/{id}")
     @Timed
-    public ResponseEntity<ContractDTO> getContract(@PathVariable Long id) {
+    public ResponseEntity<Contract> getContract(@PathVariable Long id) {
         log.debug("REST request to get Contract : {}", id);
-        Optional<ContractDTO> contractDTO = contractService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(contractDTO);
+        Optional<Contract> contract = contractService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(contract);
     }
 
     /**
      * DELETE  /contracts/:id : delete the "id" contract.
      *
-     * @param id the id of the contractDTO to delete
+     * @param id the id of the contract to delete
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/contracts/{id}")

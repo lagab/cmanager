@@ -1,6 +1,6 @@
 package com.lagab.cmanager.service;
 
-import com.lagab.cmanager.service.dto.ProjectDTO;
+import com.lagab.cmanager.domain.Project;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +15,10 @@ public interface ProjectService {
     /**
      * Save a project.
      *
-     * @param projectDTO the entity to save
+     * @param project the entity to save
      * @return the persisted entity
      */
-    ProjectDTO save(ProjectDTO projectDTO);
+    Project save(Project project);
 
     /**
      * Get all the projects.
@@ -26,7 +26,7 @@ public interface ProjectService {
      * @param pageable the pagination information
      * @return the list of entities
      */
-    Page<ProjectDTO> findAll(Pageable pageable);
+    Page<Project> findAll(Pageable pageable);
 
 
     /**
@@ -35,7 +35,7 @@ public interface ProjectService {
      * @param id the id of the entity
      * @return the entity
      */
-    Optional<ProjectDTO> findOne(Long id);
+    Optional<Project> findOne(Long id);
 
     /**
      * Delete the "id" project.

@@ -3,8 +3,6 @@ package com.lagab.cmanager.service.impl;
 import com.lagab.cmanager.service.ContactFolderService;
 import com.lagab.cmanager.domain.ContactFolder;
 import com.lagab.cmanager.repository.ContactFolderRepository;
-import com.lagab.cmanager.service.dto.ContactFolderDTO;
-import com.lagab.cmanager.service.mapper.ContactFolderMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,25 +24,19 @@ public class ContactFolderServiceImpl implements ContactFolderService {
 
     private final ContactFolderRepository contactFolderRepository;
 
-    private final ContactFolderMapper contactFolderMapper;
-
-    public ContactFolderServiceImpl(ContactFolderRepository contactFolderRepository, ContactFolderMapper contactFolderMapper) {
+    public ContactFolderServiceImpl(ContactFolderRepository contactFolderRepository) {
         this.contactFolderRepository = contactFolderRepository;
-        this.contactFolderMapper = contactFolderMapper;
     }
 
     /**
      * Save a contactFolder.
      *
-     * @param contactFolderDTO the entity to save
+     * @param contactFolder the entity to save
      * @return the persisted entity
      */
     @Override
-    public ContactFolderDTO save(ContactFolderDTO contactFolderDTO) {
-        log.debug("Request to save ContactFolder : {}", contactFolderDTO);
-        ContactFolder contactFolder = contactFolderMapper.toEntity(contactFolderDTO);
-        contactFolder = contactFolderRepository.save(contactFolder);
-        return contactFolderMapper.toDto(contactFolder);
+    public ContactFolder save(ContactFolder contactFolder) {
+        log.debug("Request to save ContactFolder : {}", contactFolder);        return contactFolderRepository.save(contactFolder);
     }
 
     /**
@@ -55,10 +47,9 @@ public class ContactFolderServiceImpl implements ContactFolderService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<ContactFolderDTO> findAll(Pageable pageable) {
+    public Page<ContactFolder> findAll(Pageable pageable) {
         log.debug("Request to get all ContactFolders");
-        return contactFolderRepository.findAll(pageable)
-            .map(contactFolderMapper::toDto);
+        return contactFolderRepository.findAll(pageable);
     }
 
 
@@ -70,10 +61,9 @@ public class ContactFolderServiceImpl implements ContactFolderService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Optional<ContactFolderDTO> findOne(Long id) {
+    public Optional<ContactFolder> findOne(Long id) {
         log.debug("Request to get ContactFolder : {}", id);
-        return contactFolderRepository.findById(id)
-            .map(contactFolderMapper::toDto);
+        return contactFolderRepository.findById(id);
     }
 
     /**

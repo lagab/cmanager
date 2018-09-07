@@ -40,7 +40,7 @@
     </changeSet>
     
     <!-- Added the entity audit columns -->
-    <changeSet id="20180906155508-audit-1" author="jhipster-entity-audit">
+    <changeSet id="20180907073459-audit-1" author="jhipster-entity-audit">
         <addColumn tableName="contact_list">
             <column name="created_by" type="varchar(50)">
                 <constraints nullable="false"/>

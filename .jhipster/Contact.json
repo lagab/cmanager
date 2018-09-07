@@ -40,7 +40,7 @@
     ],
     "changelogDate": "20180906154758",
     "entityTableName": "contact",
-    "dto": "mapstruct",
+    "dto": "no",
     "pagination": "pagination",
     "service": "serviceImpl",
     "jpaMetamodelFiltering": false,

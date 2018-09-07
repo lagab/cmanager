@@ -1,6 +1,6 @@
 package com.lagab.cmanager.service;
 
-import com.lagab.cmanager.service.dto.ContactFolderDTO;
+import com.lagab.cmanager.domain.ContactFolder;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +15,10 @@ public interface ContactFolderService {
     /**
      * Save a contactFolder.
      *
-     * @param contactFolderDTO the entity to save
+     * @param contactFolder the entity to save
      * @return the persisted entity
      */
-    ContactFolderDTO save(ContactFolderDTO contactFolderDTO);
+    ContactFolder save(ContactFolder contactFolder);
 
     /**
      * Get all the contactFolders.
@@ -26,7 +26,7 @@ public interface ContactFolderService {
      * @param pageable the pagination information
      * @return the list of entities
      */
-    Page<ContactFolderDTO> findAll(Pageable pageable);
+    Page<ContactFolder> findAll(Pageable pageable);
 
 
     /**
@@ -35,7 +35,7 @@ public interface ContactFolderService {
      * @param id the id of the entity
      * @return the entity
      */
-    Optional<ContactFolderDTO> findOne(Long id);
+    Optional<ContactFolder> findOne(Long id);
 
     /**
      * Delete the "id" contactFolder.

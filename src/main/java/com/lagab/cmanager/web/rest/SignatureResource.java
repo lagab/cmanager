@@ -1,11 +1,11 @@
 package com.lagab.cmanager.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.lagab.cmanager.domain.Signature;
 import com.lagab.cmanager.service.SignatureService;
 import com.lagab.cmanager.web.rest.errors.BadRequestAlertException;
 import com.lagab.cmanager.web.rest.util.HeaderUtil;
 import com.lagab.cmanager.web.rest.util.PaginationUtil;
-import com.lagab.cmanager.service.dto.SignatureDTO;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,18 +43,18 @@ public class SignatureResource {
     /**
      * POST  /signatures : Create a new signature.
      *
-     * @param signatureDTO the signatureDTO to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new signatureDTO, or with status 400 (Bad Request) if the signature has already an ID
+     * @param signature the signature to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new signature, or with status 400 (Bad Request) if the signature has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/signatures")
     @Timed
-    public ResponseEntity<SignatureDTO> createSignature(@Valid @RequestBody SignatureDTO signatureDTO) throws URISyntaxException {
-        log.debug("REST request to save Signature : {}", signatureDTO);
-        if (signatureDTO.getId() != null) {
+    public ResponseEntity<Signature> createSignature(@Valid @RequestBody Signature signature) throws URISyntaxException {
+        log.debug("REST request to save Signature : {}", signature);
+        if (signature.getId() != null) {
             throw new BadRequestAlertException("A new signature cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        SignatureDTO result = signatureService.save(signatureDTO);
+        Signature result = signatureService.save(signature);
         return ResponseEntity.created(new URI("/api/signatures/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -63,22 +63,22 @@ public class SignatureResource {
     /**
      * PUT  /signatures : Updates an existing signature.
      *
-     * @param signatureDTO the signatureDTO to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated signatureDTO,
-     * or with status 400 (Bad Request) if the signatureDTO is not valid,
-     * or with status 500 (Internal Server Error) if the signatureDTO couldn't be updated
+     * @param signature the signature to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated signature,
+     * or with status 400 (Bad Request) if the signature is not valid,
+     * or with status 500 (Internal Server Error) if the signature couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/signatures")
     @Timed
-    public ResponseEntity<SignatureDTO> updateSignature(@Valid @RequestBody SignatureDTO signatureDTO) throws URISyntaxException {
-        log.debug("REST request to update Signature : {}", signatureDTO);
-        if (signatureDTO.getId() == null) {
+    public ResponseEntity<Signature> updateSignature(@Valid @RequestBody Signature signature) throws URISyntaxException {
+        log.debug("REST request to update Signature : {}", signature);
+        if (signature.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        SignatureDTO result = signatureService.save(signatureDTO);
+        Signature result = signatureService.save(signature);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, signatureDTO.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, signature.getId().toString()))
             .body(result);
     }
 
@@ -90,9 +90,9 @@ public class SignatureResource {
      */
     @GetMapping("/signatures")
     @Timed
-    public ResponseEntity<List<SignatureDTO>> getAllSignatures(Pageable pageable) {
+    public ResponseEntity<List<Signature>> getAllSignatures(Pageable pageable) {
         log.debug("REST request to get a page of Signatures");
-        Page<SignatureDTO> page = signatureService.findAll(pageable);
+        Page<Signature> page = signatureService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/signatures");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -100,21 +100,21 @@ public class SignatureResource {
     /**
      * GET  /signatures/:id : get the "id" signature.
      *
-     * @param id the id of the signatureDTO to retrieve
-     * @return the ResponseEntity with status 200 (OK) and with body the signatureDTO, or with status 404 (Not Found)
+     * @param id the id of the signature to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the signature, or with status 404 (Not Found)
      */
     @GetMapping("/signatures/{id}")
     @Timed
-    public ResponseEntity<SignatureDTO> getSignature(@PathVariable Long id) {
+    public ResponseEntity<Signature> getSignature(@PathVariable Long id) {
         log.debug("REST request to get Signature : {}", id);
-        Optional<SignatureDTO> signatureDTO = signatureService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(signatureDTO);
+        Optional<Signature> signature = signatureService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(signature);
     }
 
     /**
      * DELETE  /signatures/:id : delete the "id" signature.
      *
-     * @param id the id of the signatureDTO to delete
+     * @param id the id of the signature to delete
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/signatures/{id}")

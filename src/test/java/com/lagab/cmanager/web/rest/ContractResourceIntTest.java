@@ -5,8 +5,6 @@ import com.lagab.cmanager.CmanagerApp;
 import com.lagab.cmanager.domain.Contract;
 import com.lagab.cmanager.repository.ContractRepository;
 import com.lagab.cmanager.service.ContractService;
-import com.lagab.cmanager.service.dto.ContractDTO;
-import com.lagab.cmanager.service.mapper.ContractMapper;
 import com.lagab.cmanager.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -78,9 +76,6 @@ public class ContractResourceIntTest {
     @Autowired
     private ContractRepository contractRepository;
 
-
-    @Autowired
-    private ContractMapper contractMapper;
     
 
     @Autowired
@@ -145,10 +140,9 @@ public class ContractResourceIntTest {
         int databaseSizeBeforeCreate = contractRepository.findAll().size();
 
         // Create the Contract
-        ContractDTO contractDTO = contractMapper.toDto(contract);
         restContractMockMvc.perform(post("/api/contracts")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contractDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contract)))
             .andExpect(status().isCreated());
 
         // Validate the Contract in the database
@@ -174,12 +168,11 @@ public class ContractResourceIntTest {
 
         // Create the Contract with an existing ID
         contract.setId(1L);
-        ContractDTO contractDTO = contractMapper.toDto(contract);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restContractMockMvc.perform(post("/api/contracts")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contractDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contract)))
             .andExpect(status().isBadRequest());
 
         // Validate the Contract in the database
@@ -195,11 +188,10 @@ public class ContractResourceIntTest {
         contract.setUuid(null);
 
         // Create the Contract, which fails.
-        ContractDTO contractDTO = contractMapper.toDto(contract);
 
         restContractMockMvc.perform(post("/api/contracts")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contractDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contract)))
             .andExpect(status().isBadRequest());
 
         List<Contract> contractList = contractRepository.findAll();
@@ -214,11 +206,10 @@ public class ContractResourceIntTest {
         contract.setName(null);
 
         // Create the Contract, which fails.
-        ContractDTO contractDTO = contractMapper.toDto(contract);
 
         restContractMockMvc.perform(post("/api/contracts")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contractDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contract)))
             .andExpect(status().isBadRequest());
 
         List<Contract> contractList = contractRepository.findAll();
@@ -233,11 +224,10 @@ public class ContractResourceIntTest {
         contract.setSubject(null);
 
         // Create the Contract, which fails.
-        ContractDTO contractDTO = contractMapper.toDto(contract);
 
         restContractMockMvc.perform(post("/api/contracts")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contractDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contract)))
             .andExpect(status().isBadRequest());
 
         List<Contract> contractList = contractRepository.findAll();
@@ -252,11 +242,10 @@ public class ContractResourceIntTest {
         contract.setLastActivityAt(null);
 
         // Create the Contract, which fails.
-        ContractDTO contractDTO = contractMapper.toDto(contract);
 
         restContractMockMvc.perform(post("/api/contracts")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contractDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contract)))
             .andExpect(status().isBadRequest());
 
         List<Contract> contractList = contractRepository.findAll();
@@ -321,7 +310,7 @@ public class ContractResourceIntTest {
     @Transactional
     public void updateContract() throws Exception {
         // Initialize the database
-        contractRepository.saveAndFlush(contract);
+        contractService.save(contract);
 
         int databaseSizeBeforeUpdate = contractRepository.findAll().size();
 
@@ -340,11 +329,10 @@ public class ContractResourceIntTest {
             .lastActivityAt(UPDATED_LAST_ACTIVITY_AT)
             .expiresAt(UPDATED_EXPIRES_AT)
             .type(UPDATED_TYPE);
-        ContractDTO contractDTO = contractMapper.toDto(updatedContract);
 
         restContractMockMvc.perform(put("/api/contracts")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contractDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(updatedContract)))
             .andExpect(status().isOk());
 
         // Validate the Contract in the database
@@ -369,12 +357,11 @@ public class ContractResourceIntTest {
         int databaseSizeBeforeUpdate = contractRepository.findAll().size();
 
         // Create the Contract
-        ContractDTO contractDTO = contractMapper.toDto(contract);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException 
         restContractMockMvc.perform(put("/api/contracts")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contractDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contract)))
             .andExpect(status().isBadRequest());
 
         // Validate the Contract in the database
@@ -386,7 +373,7 @@ public class ContractResourceIntTest {
     @Transactional
     public void deleteContract() throws Exception {
         // Initialize the database
-        contractRepository.saveAndFlush(contract);
+        contractService.save(contract);
 
         int databaseSizeBeforeDelete = contractRepository.findAll().size();
 
@@ -413,28 +400,5 @@ public class ContractResourceIntTest {
         assertThat(contract1).isNotEqualTo(contract2);
         contract1.setId(null);
         assertThat(contract1).isNotEqualTo(contract2);
-    }
-
-    @Test
-    @Transactional
-    public void dtoEqualsVerifier() throws Exception {
-        TestUtil.equalsVerifier(ContractDTO.class);
-        ContractDTO contractDTO1 = new ContractDTO();
-        contractDTO1.setId(1L);
-        ContractDTO contractDTO2 = new ContractDTO();
-        assertThat(contractDTO1).isNotEqualTo(contractDTO2);
-        contractDTO2.setId(contractDTO1.getId());
-        assertThat(contractDTO1).isEqualTo(contractDTO2);
-        contractDTO2.setId(2L);
-        assertThat(contractDTO1).isNotEqualTo(contractDTO2);
-        contractDTO1.setId(null);
-        assertThat(contractDTO1).isNotEqualTo(contractDTO2);
-    }
-
-    @Test
-    @Transactional
-    public void testEntityFromId() {
-        assertThat(contractMapper.fromId(42L).getId()).isEqualTo(42);
-        assertThat(contractMapper.fromId(null)).isNull();
     }
 }

@@ -25,7 +25,7 @@
     ],
     "changelogDate": "20180906154756",
     "entityTableName": "contact_folder",
-    "dto": "mapstruct",
+    "dto": "no",
     "pagination": "pagination",
     "service": "serviceImpl",
     "jpaMetamodelFiltering": false,

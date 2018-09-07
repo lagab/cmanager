@@ -5,8 +5,6 @@ import com.lagab.cmanager.CmanagerApp;
 import com.lagab.cmanager.domain.Contact;
 import com.lagab.cmanager.repository.ContactRepository;
 import com.lagab.cmanager.service.ContactService;
-import com.lagab.cmanager.service.dto.ContactDTO;
-import com.lagab.cmanager.service.mapper.ContactMapper;
 import com.lagab.cmanager.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -64,9 +62,6 @@ public class ContactResourceIntTest {
     @Autowired
     private ContactRepository contactRepository;
 
-
-    @Autowired
-    private ContactMapper contactMapper;
     
 
     @Autowired
@@ -127,10 +122,9 @@ public class ContactResourceIntTest {
         int databaseSizeBeforeCreate = contactRepository.findAll().size();
 
         // Create the Contact
-        ContactDTO contactDTO = contactMapper.toDto(contact);
         restContactMockMvc.perform(post("/api/contacts")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contactDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contact)))
             .andExpect(status().isCreated());
 
         // Validate the Contact in the database
@@ -152,12 +146,11 @@ public class ContactResourceIntTest {
 
         // Create the Contact with an existing ID
         contact.setId(1L);
-        ContactDTO contactDTO = contactMapper.toDto(contact);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restContactMockMvc.perform(post("/api/contacts")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contactDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contact)))
             .andExpect(status().isBadRequest());
 
         // Validate the Contact in the database
@@ -173,11 +166,10 @@ public class ContactResourceIntTest {
         contact.setEmail(null);
 
         // Create the Contact, which fails.
-        ContactDTO contactDTO = contactMapper.toDto(contact);
 
         restContactMockMvc.perform(post("/api/contacts")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contactDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contact)))
             .andExpect(status().isBadRequest());
 
         List<Contact> contactList = contactRepository.findAll();
@@ -234,7 +226,7 @@ public class ContactResourceIntTest {
     @Transactional
     public void updateContact() throws Exception {
         // Initialize the database
-        contactRepository.saveAndFlush(contact);
+        contactService.save(contact);
 
         int databaseSizeBeforeUpdate = contactRepository.findAll().size();
 
@@ -249,11 +241,10 @@ public class ContactResourceIntTest {
             .lastName(UPDATED_LAST_NAME)
             .firstName(UPDATED_FIRST_NAME)
             .attributes(UPDATED_ATTRIBUTES);
-        ContactDTO contactDTO = contactMapper.toDto(updatedContact);
 
         restContactMockMvc.perform(put("/api/contacts")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contactDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(updatedContact)))
             .andExpect(status().isOk());
 
         // Validate the Contact in the database
@@ -274,12 +265,11 @@ public class ContactResourceIntTest {
         int databaseSizeBeforeUpdate = contactRepository.findAll().size();
 
         // Create the Contact
-        ContactDTO contactDTO = contactMapper.toDto(contact);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException 
         restContactMockMvc.perform(put("/api/contacts")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(contactDTO)))
+            .content(TestUtil.convertObjectToJsonBytes(contact)))
             .andExpect(status().isBadRequest());
 
         // Validate the Contact in the database
@@ -291,7 +281,7 @@ public class ContactResourceIntTest {
     @Transactional
     public void deleteContact() throws Exception {
         // Initialize the database
-        contactRepository.saveAndFlush(contact);
+        contactService.save(contact);
 
         int databaseSizeBeforeDelete = contactRepository.findAll().size();
 
@@ -318,28 +308,5 @@ public class ContactResourceIntTest {
         assertThat(contact1).isNotEqualTo(contact2);
         contact1.setId(null);
         assertThat(contact1).isNotEqualTo(contact2);
-    }
-
-    @Test
-    @Transactional
-    public void dtoEqualsVerifier() throws Exception {
-        TestUtil.equalsVerifier(ContactDTO.class);
-        ContactDTO contactDTO1 = new ContactDTO();
-        contactDTO1.setId(1L);
-        ContactDTO contactDTO2 = new ContactDTO();
-        assertThat(contactDTO1).isNotEqualTo(contactDTO2);
-        contactDTO2.setId(contactDTO1.getId());
-        assertThat(contactDTO1).isEqualTo(contactDTO2);
-        contactDTO2.setId(2L);
-        assertThat(contactDTO1).isNotEqualTo(contactDTO2);
-        contactDTO1.setId(null);
-        assertThat(contactDTO1).isNotEqualTo(contactDTO2);
-    }
-
-    @Test
-    @Transactional
-    public void testEntityFromId() {
-        assertThat(contactMapper.fromId(42L).getId()).isEqualTo(42);
-        assertThat(contactMapper.fromId(null)).isNull();
     }
 }
