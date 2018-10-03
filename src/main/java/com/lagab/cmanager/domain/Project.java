@@ -1,7 +1,7 @@
 package com.lagab.cmanager.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.*;
+import com.lagab.cmanager.service.util.EntityIdResolver;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -55,6 +55,12 @@ public class Project extends AbstractAuditingEntity implements Serializable {
 
     @ManyToOne
     @JsonIgnoreProperties("projects")
+    @JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id",
+        resolver = EntityIdResolver.class,
+        scope = Workspace.class
+    )
     private Workspace workspace;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
