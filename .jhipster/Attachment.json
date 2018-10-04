@@ -55,6 +55,6 @@
     "searchEngine": false,
     "service": "serviceImpl",
     "entityTableName": "attachment",
-    "jpaMetamodelFiltering": false,
+    "jpaMetamodelFiltering": true,
     "pagination": "pagination"
 }

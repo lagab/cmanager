@@ -6,6 +6,8 @@ import com.lagab.cmanager.service.ContactFolderService;
 import com.lagab.cmanager.web.rest.errors.BadRequestAlertException;
 import com.lagab.cmanager.web.rest.util.HeaderUtil;
 import com.lagab.cmanager.web.rest.util.PaginationUtil;
+import com.lagab.cmanager.service.dto.ContactFolderCriteria;
+import com.lagab.cmanager.service.ContactFolderQueryService;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +38,11 @@ public class ContactFolderResource {
 
     private final ContactFolderService contactFolderService;
 
-    public ContactFolderResource(ContactFolderService contactFolderService) {
+    private final ContactFolderQueryService contactFolderQueryService;
+
+    public ContactFolderResource(ContactFolderService contactFolderService, ContactFolderQueryService contactFolderQueryService) {
         this.contactFolderService = contactFolderService;
+        this.contactFolderQueryService = contactFolderQueryService;
     }
 
     /**
@@ -86,13 +91,14 @@ public class ContactFolderResource {
      * GET  /contact-folders : get all the contactFolders.
      *
      * @param pageable the pagination information
+     * @param criteria the criterias which the requested entities should match
      * @return the ResponseEntity with status 200 (OK) and the list of contactFolders in body
      */
     @GetMapping("/contact-folders")
     @Timed
-    public ResponseEntity<List<ContactFolder>> getAllContactFolders(Pageable pageable) {
-        log.debug("REST request to get a page of ContactFolders");
-        Page<ContactFolder> page = contactFolderService.findAll(pageable);
+    public ResponseEntity<List<ContactFolder>> getAllContactFolders(ContactFolderCriteria criteria, Pageable pageable) {
+        log.debug("REST request to get ContactFolders by criteria: {}", criteria);
+        Page<ContactFolder> page = contactFolderQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/contact-folders");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

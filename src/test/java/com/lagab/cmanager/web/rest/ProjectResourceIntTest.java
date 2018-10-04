@@ -3,9 +3,14 @@ package com.lagab.cmanager.web.rest;
 import com.lagab.cmanager.CmanagerApp;
 
 import com.lagab.cmanager.domain.Project;
+import com.lagab.cmanager.domain.Contract;
+import com.lagab.cmanager.domain.ContactFolder;
+import com.lagab.cmanager.domain.Workspace;
 import com.lagab.cmanager.repository.ProjectRepository;
 import com.lagab.cmanager.service.ProjectService;
 import com.lagab.cmanager.web.rest.errors.ExceptionTranslator;
+import com.lagab.cmanager.service.dto.ProjectCriteria;
+import com.lagab.cmanager.service.ProjectQueryService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -62,6 +67,9 @@ public class ProjectResourceIntTest {
     private ProjectService projectService;
 
     @Autowired
+    private ProjectQueryService projectQueryService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -80,7 +88,7 @@ public class ProjectResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ProjectResource projectResource = new ProjectResource(projectService);
+        final ProjectResource projectResource = new ProjectResource(projectService, projectQueryService);
         this.restProjectMockMvc = MockMvcBuilders.standaloneSetup(projectResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -236,6 +244,244 @@ public class ProjectResourceIntTest {
             .andExpect(jsonPath("$.visibility").value(DEFAULT_VISIBILITY.toString()))
             .andExpect(jsonPath("$.archived").value(DEFAULT_ARCHIVED.booleanValue()));
     }
+
+    @Test
+    @Transactional
+    public void getAllProjectsByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where name equals to DEFAULT_NAME
+        defaultProjectShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the projectList where name equals to UPDATED_NAME
+        defaultProjectShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllProjectsByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultProjectShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the projectList where name equals to UPDATED_NAME
+        defaultProjectShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllProjectsByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where name is not null
+        defaultProjectShouldBeFound("name.specified=true");
+
+        // Get all the projectList where name is null
+        defaultProjectShouldNotBeFound("name.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllProjectsByPathIsEqualToSomething() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where path equals to DEFAULT_PATH
+        defaultProjectShouldBeFound("path.equals=" + DEFAULT_PATH);
+
+        // Get all the projectList where path equals to UPDATED_PATH
+        defaultProjectShouldNotBeFound("path.equals=" + UPDATED_PATH);
+    }
+
+    @Test
+    @Transactional
+    public void getAllProjectsByPathIsInShouldWork() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where path in DEFAULT_PATH or UPDATED_PATH
+        defaultProjectShouldBeFound("path.in=" + DEFAULT_PATH + "," + UPDATED_PATH);
+
+        // Get all the projectList where path equals to UPDATED_PATH
+        defaultProjectShouldNotBeFound("path.in=" + UPDATED_PATH);
+    }
+
+    @Test
+    @Transactional
+    public void getAllProjectsByPathIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where path is not null
+        defaultProjectShouldBeFound("path.specified=true");
+
+        // Get all the projectList where path is null
+        defaultProjectShouldNotBeFound("path.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllProjectsByVisibilityIsEqualToSomething() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where visibility equals to DEFAULT_VISIBILITY
+        defaultProjectShouldBeFound("visibility.equals=" + DEFAULT_VISIBILITY);
+
+        // Get all the projectList where visibility equals to UPDATED_VISIBILITY
+        defaultProjectShouldNotBeFound("visibility.equals=" + UPDATED_VISIBILITY);
+    }
+
+    @Test
+    @Transactional
+    public void getAllProjectsByVisibilityIsInShouldWork() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where visibility in DEFAULT_VISIBILITY or UPDATED_VISIBILITY
+        defaultProjectShouldBeFound("visibility.in=" + DEFAULT_VISIBILITY + "," + UPDATED_VISIBILITY);
+
+        // Get all the projectList where visibility equals to UPDATED_VISIBILITY
+        defaultProjectShouldNotBeFound("visibility.in=" + UPDATED_VISIBILITY);
+    }
+
+    @Test
+    @Transactional
+    public void getAllProjectsByVisibilityIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where visibility is not null
+        defaultProjectShouldBeFound("visibility.specified=true");
+
+        // Get all the projectList where visibility is null
+        defaultProjectShouldNotBeFound("visibility.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllProjectsByArchivedIsEqualToSomething() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where archived equals to DEFAULT_ARCHIVED
+        defaultProjectShouldBeFound("archived.equals=" + DEFAULT_ARCHIVED);
+
+        // Get all the projectList where archived equals to UPDATED_ARCHIVED
+        defaultProjectShouldNotBeFound("archived.equals=" + UPDATED_ARCHIVED);
+    }
+
+    @Test
+    @Transactional
+    public void getAllProjectsByArchivedIsInShouldWork() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where archived in DEFAULT_ARCHIVED or UPDATED_ARCHIVED
+        defaultProjectShouldBeFound("archived.in=" + DEFAULT_ARCHIVED + "," + UPDATED_ARCHIVED);
+
+        // Get all the projectList where archived equals to UPDATED_ARCHIVED
+        defaultProjectShouldNotBeFound("archived.in=" + UPDATED_ARCHIVED);
+    }
+
+    @Test
+    @Transactional
+    public void getAllProjectsByArchivedIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where archived is not null
+        defaultProjectShouldBeFound("archived.specified=true");
+
+        // Get all the projectList where archived is null
+        defaultProjectShouldNotBeFound("archived.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllProjectsByContractsIsEqualToSomething() throws Exception {
+        // Initialize the database
+        Contract contracts = ContractResourceIntTest.createEntity(em);
+        em.persist(contracts);
+        em.flush();
+        project.addContracts(contracts);
+        projectRepository.saveAndFlush(project);
+        Long contractsId = contracts.getId();
+
+        // Get all the projectList where contracts equals to contractsId
+        defaultProjectShouldBeFound("contractsId.equals=" + contractsId);
+
+        // Get all the projectList where contracts equals to contractsId + 1
+        defaultProjectShouldNotBeFound("contractsId.equals=" + (contractsId + 1));
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllProjectsByContactFoldersIsEqualToSomething() throws Exception {
+        // Initialize the database
+        ContactFolder contactFolders = ContactFolderResourceIntTest.createEntity(em);
+        em.persist(contactFolders);
+        em.flush();
+        project.addContactFolders(contactFolders);
+        projectRepository.saveAndFlush(project);
+        Long contactFoldersId = contactFolders.getId();
+
+        // Get all the projectList where contactFolders equals to contactFoldersId
+        defaultProjectShouldBeFound("contactFoldersId.equals=" + contactFoldersId);
+
+        // Get all the projectList where contactFolders equals to contactFoldersId + 1
+        defaultProjectShouldNotBeFound("contactFoldersId.equals=" + (contactFoldersId + 1));
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllProjectsByWorkspaceIsEqualToSomething() throws Exception {
+        // Initialize the database
+        Workspace workspace = WorkspaceResourceIntTest.createEntity(em);
+        em.persist(workspace);
+        em.flush();
+        project.setWorkspace(workspace);
+        projectRepository.saveAndFlush(project);
+        Long workspaceId = workspace.getId();
+
+        // Get all the projectList where workspace equals to workspaceId
+        defaultProjectShouldBeFound("workspaceId.equals=" + workspaceId);
+
+        // Get all the projectList where workspace equals to workspaceId + 1
+        defaultProjectShouldNotBeFound("workspaceId.equals=" + (workspaceId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned
+     */
+    private void defaultProjectShouldBeFound(String filter) throws Exception {
+        restProjectMockMvc.perform(get("/api/projects?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().intValue())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
+            .andExpect(jsonPath("$.[*].path").value(hasItem(DEFAULT_PATH.toString())))
+            .andExpect(jsonPath("$.[*].visibility").value(hasItem(DEFAULT_VISIBILITY.toString())))
+            .andExpect(jsonPath("$.[*].archived").value(hasItem(DEFAULT_ARCHIVED.booleanValue())));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned
+     */
+    private void defaultProjectShouldNotBeFound(String filter) throws Exception {
+        restProjectMockMvc.perform(get("/api/projects?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+    }
+
     @Test
     @Transactional
     public void getNonExistingProject() throws Exception {

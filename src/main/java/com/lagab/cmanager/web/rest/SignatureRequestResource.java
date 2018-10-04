@@ -6,6 +6,8 @@ import com.lagab.cmanager.service.SignatureRequestService;
 import com.lagab.cmanager.web.rest.errors.BadRequestAlertException;
 import com.lagab.cmanager.web.rest.util.HeaderUtil;
 import com.lagab.cmanager.web.rest.util.PaginationUtil;
+import com.lagab.cmanager.service.dto.SignatureRequestCriteria;
+import com.lagab.cmanager.service.SignatureRequestQueryService;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +38,11 @@ public class SignatureRequestResource {
 
     private final SignatureRequestService signatureRequestService;
 
-    public SignatureRequestResource(SignatureRequestService signatureRequestService) {
+    private final SignatureRequestQueryService signatureRequestQueryService;
+
+    public SignatureRequestResource(SignatureRequestService signatureRequestService, SignatureRequestQueryService signatureRequestQueryService) {
         this.signatureRequestService = signatureRequestService;
+        this.signatureRequestQueryService = signatureRequestQueryService;
     }
 
     /**
@@ -86,13 +91,14 @@ public class SignatureRequestResource {
      * GET  /signature-requests : get all the signatureRequests.
      *
      * @param pageable the pagination information
+     * @param criteria the criterias which the requested entities should match
      * @return the ResponseEntity with status 200 (OK) and the list of signatureRequests in body
      */
     @GetMapping("/signature-requests")
     @Timed
-    public ResponseEntity<List<SignatureRequest>> getAllSignatureRequests(Pageable pageable) {
-        log.debug("REST request to get a page of SignatureRequests");
-        Page<SignatureRequest> page = signatureRequestService.findAll(pageable);
+    public ResponseEntity<List<SignatureRequest>> getAllSignatureRequests(SignatureRequestCriteria criteria, Pageable pageable) {
+        log.debug("REST request to get SignatureRequests by criteria: {}", criteria);
+        Page<SignatureRequest> page = signatureRequestQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/signature-requests");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

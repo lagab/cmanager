@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface ContactListRepository extends JpaRepository<ContactList, Long> {
+public interface ContactListRepository extends JpaRepository<ContactList, Long>, JpaSpecificationExecutor<ContactList> {
 
 }

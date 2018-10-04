@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface SignatureRequestRepository extends JpaRepository<SignatureRequest, Long> {
+public interface SignatureRequestRepository extends JpaRepository<SignatureRequest, Long>, JpaSpecificationExecutor<SignatureRequest> {
 
 }

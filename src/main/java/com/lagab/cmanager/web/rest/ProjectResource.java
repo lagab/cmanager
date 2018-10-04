@@ -6,6 +6,8 @@ import com.lagab.cmanager.service.ProjectService;
 import com.lagab.cmanager.web.rest.errors.BadRequestAlertException;
 import com.lagab.cmanager.web.rest.util.HeaderUtil;
 import com.lagab.cmanager.web.rest.util.PaginationUtil;
+import com.lagab.cmanager.service.dto.ProjectCriteria;
+import com.lagab.cmanager.service.ProjectQueryService;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +38,11 @@ public class ProjectResource {
 
     private final ProjectService projectService;
 
-    public ProjectResource(ProjectService projectService) {
+    private final ProjectQueryService projectQueryService;
+
+    public ProjectResource(ProjectService projectService, ProjectQueryService projectQueryService) {
         this.projectService = projectService;
+        this.projectQueryService = projectQueryService;
     }
 
     /**
@@ -86,13 +91,14 @@ public class ProjectResource {
      * GET  /projects : get all the projects.
      *
      * @param pageable the pagination information
+     * @param criteria the criterias which the requested entities should match
      * @return the ResponseEntity with status 200 (OK) and the list of projects in body
      */
     @GetMapping("/projects")
     @Timed
-    public ResponseEntity<List<Project>> getAllProjects(Pageable pageable) {
-        log.debug("REST request to get a page of Projects");
-        Page<Project> page = projectService.findAll(pageable);
+    public ResponseEntity<List<Project>> getAllProjects(ProjectCriteria criteria, Pageable pageable) {
+        log.debug("REST request to get Projects by criteria: {}", criteria);
+        Page<Project> page = projectQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/projects");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

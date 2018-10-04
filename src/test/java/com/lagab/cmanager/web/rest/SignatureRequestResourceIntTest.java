@@ -3,9 +3,13 @@ package com.lagab.cmanager.web.rest;
 import com.lagab.cmanager.CmanagerApp;
 
 import com.lagab.cmanager.domain.SignatureRequest;
+import com.lagab.cmanager.domain.Signature;
+import com.lagab.cmanager.domain.Contract;
 import com.lagab.cmanager.repository.SignatureRequestRepository;
 import com.lagab.cmanager.service.SignatureRequestService;
 import com.lagab.cmanager.web.rest.errors.ExceptionTranslator;
+import com.lagab.cmanager.service.dto.SignatureRequestCriteria;
+import com.lagab.cmanager.service.SignatureRequestQueryService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -64,6 +68,9 @@ public class SignatureRequestResourceIntTest {
     private SignatureRequestService signatureRequestService;
 
     @Autowired
+    private SignatureRequestQueryService signatureRequestQueryService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -82,7 +89,7 @@ public class SignatureRequestResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final SignatureRequestResource signatureRequestResource = new SignatureRequestResource(signatureRequestService);
+        final SignatureRequestResource signatureRequestResource = new SignatureRequestResource(signatureRequestService, signatureRequestQueryService);
         this.restSignatureRequestMockMvc = MockMvcBuilders.standaloneSetup(signatureRequestResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -224,6 +231,265 @@ public class SignatureRequestResourceIntTest {
             .andExpect(jsonPath("$.message").value(DEFAULT_MESSAGE.toString()))
             .andExpect(jsonPath("$.ccEmail").value(DEFAULT_CC_EMAIL.toString()));
     }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsByRequesterEmailIsEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where requesterEmail equals to DEFAULT_REQUESTER_EMAIL
+        defaultSignatureRequestShouldBeFound("requesterEmail.equals=" + DEFAULT_REQUESTER_EMAIL);
+
+        // Get all the signatureRequestList where requesterEmail equals to UPDATED_REQUESTER_EMAIL
+        defaultSignatureRequestShouldNotBeFound("requesterEmail.equals=" + UPDATED_REQUESTER_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsByRequesterEmailIsInShouldWork() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where requesterEmail in DEFAULT_REQUESTER_EMAIL or UPDATED_REQUESTER_EMAIL
+        defaultSignatureRequestShouldBeFound("requesterEmail.in=" + DEFAULT_REQUESTER_EMAIL + "," + UPDATED_REQUESTER_EMAIL);
+
+        // Get all the signatureRequestList where requesterEmail equals to UPDATED_REQUESTER_EMAIL
+        defaultSignatureRequestShouldNotBeFound("requesterEmail.in=" + UPDATED_REQUESTER_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsByRequesterEmailIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where requesterEmail is not null
+        defaultSignatureRequestShouldBeFound("requesterEmail.specified=true");
+
+        // Get all the signatureRequestList where requesterEmail is null
+        defaultSignatureRequestShouldNotBeFound("requesterEmail.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsByTitleIsEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where title equals to DEFAULT_TITLE
+        defaultSignatureRequestShouldBeFound("title.equals=" + DEFAULT_TITLE);
+
+        // Get all the signatureRequestList where title equals to UPDATED_TITLE
+        defaultSignatureRequestShouldNotBeFound("title.equals=" + UPDATED_TITLE);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsByTitleIsInShouldWork() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where title in DEFAULT_TITLE or UPDATED_TITLE
+        defaultSignatureRequestShouldBeFound("title.in=" + DEFAULT_TITLE + "," + UPDATED_TITLE);
+
+        // Get all the signatureRequestList where title equals to UPDATED_TITLE
+        defaultSignatureRequestShouldNotBeFound("title.in=" + UPDATED_TITLE);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsByTitleIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where title is not null
+        defaultSignatureRequestShouldBeFound("title.specified=true");
+
+        // Get all the signatureRequestList where title is null
+        defaultSignatureRequestShouldNotBeFound("title.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsBySubjectIsEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where subject equals to DEFAULT_SUBJECT
+        defaultSignatureRequestShouldBeFound("subject.equals=" + DEFAULT_SUBJECT);
+
+        // Get all the signatureRequestList where subject equals to UPDATED_SUBJECT
+        defaultSignatureRequestShouldNotBeFound("subject.equals=" + UPDATED_SUBJECT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsBySubjectIsInShouldWork() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where subject in DEFAULT_SUBJECT or UPDATED_SUBJECT
+        defaultSignatureRequestShouldBeFound("subject.in=" + DEFAULT_SUBJECT + "," + UPDATED_SUBJECT);
+
+        // Get all the signatureRequestList where subject equals to UPDATED_SUBJECT
+        defaultSignatureRequestShouldNotBeFound("subject.in=" + UPDATED_SUBJECT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsBySubjectIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where subject is not null
+        defaultSignatureRequestShouldBeFound("subject.specified=true");
+
+        // Get all the signatureRequestList where subject is null
+        defaultSignatureRequestShouldNotBeFound("subject.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsByMessageIsEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where message equals to DEFAULT_MESSAGE
+        defaultSignatureRequestShouldBeFound("message.equals=" + DEFAULT_MESSAGE);
+
+        // Get all the signatureRequestList where message equals to UPDATED_MESSAGE
+        defaultSignatureRequestShouldNotBeFound("message.equals=" + UPDATED_MESSAGE);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsByMessageIsInShouldWork() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where message in DEFAULT_MESSAGE or UPDATED_MESSAGE
+        defaultSignatureRequestShouldBeFound("message.in=" + DEFAULT_MESSAGE + "," + UPDATED_MESSAGE);
+
+        // Get all the signatureRequestList where message equals to UPDATED_MESSAGE
+        defaultSignatureRequestShouldNotBeFound("message.in=" + UPDATED_MESSAGE);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsByMessageIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where message is not null
+        defaultSignatureRequestShouldBeFound("message.specified=true");
+
+        // Get all the signatureRequestList where message is null
+        defaultSignatureRequestShouldNotBeFound("message.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsByCcEmailIsEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where ccEmail equals to DEFAULT_CC_EMAIL
+        defaultSignatureRequestShouldBeFound("ccEmail.equals=" + DEFAULT_CC_EMAIL);
+
+        // Get all the signatureRequestList where ccEmail equals to UPDATED_CC_EMAIL
+        defaultSignatureRequestShouldNotBeFound("ccEmail.equals=" + UPDATED_CC_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsByCcEmailIsInShouldWork() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where ccEmail in DEFAULT_CC_EMAIL or UPDATED_CC_EMAIL
+        defaultSignatureRequestShouldBeFound("ccEmail.in=" + DEFAULT_CC_EMAIL + "," + UPDATED_CC_EMAIL);
+
+        // Get all the signatureRequestList where ccEmail equals to UPDATED_CC_EMAIL
+        defaultSignatureRequestShouldNotBeFound("ccEmail.in=" + UPDATED_CC_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsByCcEmailIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+
+        // Get all the signatureRequestList where ccEmail is not null
+        defaultSignatureRequestShouldBeFound("ccEmail.specified=true");
+
+        // Get all the signatureRequestList where ccEmail is null
+        defaultSignatureRequestShouldNotBeFound("ccEmail.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsBySignaturesIsEqualToSomething() throws Exception {
+        // Initialize the database
+        Signature signatures = SignatureResourceIntTest.createEntity(em);
+        em.persist(signatures);
+        em.flush();
+        signatureRequest.addSignatures(signatures);
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+        Long signaturesId = signatures.getId();
+
+        // Get all the signatureRequestList where signatures equals to signaturesId
+        defaultSignatureRequestShouldBeFound("signaturesId.equals=" + signaturesId);
+
+        // Get all the signatureRequestList where signatures equals to signaturesId + 1
+        defaultSignatureRequestShouldNotBeFound("signaturesId.equals=" + (signaturesId + 1));
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllSignatureRequestsByContractIsEqualToSomething() throws Exception {
+        // Initialize the database
+        Contract contract = ContractResourceIntTest.createEntity(em);
+        em.persist(contract);
+        em.flush();
+        signatureRequest.setContract(contract);
+        signatureRequestRepository.saveAndFlush(signatureRequest);
+        Long contractId = contract.getId();
+
+        // Get all the signatureRequestList where contract equals to contractId
+        defaultSignatureRequestShouldBeFound("contractId.equals=" + contractId);
+
+        // Get all the signatureRequestList where contract equals to contractId + 1
+        defaultSignatureRequestShouldNotBeFound("contractId.equals=" + (contractId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned
+     */
+    private void defaultSignatureRequestShouldBeFound(String filter) throws Exception {
+        restSignatureRequestMockMvc.perform(get("/api/signature-requests?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(signatureRequest.getId().intValue())))
+            .andExpect(jsonPath("$.[*].requesterEmail").value(hasItem(DEFAULT_REQUESTER_EMAIL.toString())))
+            .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE.toString())))
+            .andExpect(jsonPath("$.[*].subject").value(hasItem(DEFAULT_SUBJECT.toString())))
+            .andExpect(jsonPath("$.[*].message").value(hasItem(DEFAULT_MESSAGE.toString())))
+            .andExpect(jsonPath("$.[*].ccEmail").value(hasItem(DEFAULT_CC_EMAIL.toString())));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned
+     */
+    private void defaultSignatureRequestShouldNotBeFound(String filter) throws Exception {
+        restSignatureRequestMockMvc.perform(get("/api/signature-requests?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+    }
+
     @Test
     @Transactional
     public void getNonExistingSignatureRequest() throws Exception {

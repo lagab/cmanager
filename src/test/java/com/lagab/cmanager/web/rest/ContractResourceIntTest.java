@@ -3,9 +3,13 @@ package com.lagab.cmanager.web.rest;
 import com.lagab.cmanager.CmanagerApp;
 
 import com.lagab.cmanager.domain.Contract;
+import com.lagab.cmanager.domain.SignatureRequest;
+import com.lagab.cmanager.domain.Project;
 import com.lagab.cmanager.repository.ContractRepository;
 import com.lagab.cmanager.service.ContractService;
 import com.lagab.cmanager.web.rest.errors.ExceptionTranslator;
+import com.lagab.cmanager.service.dto.ContractCriteria;
+import com.lagab.cmanager.service.ContractQueryService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -82,6 +86,9 @@ public class ContractResourceIntTest {
     private ContractService contractService;
 
     @Autowired
+    private ContractQueryService contractQueryService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -100,7 +107,7 @@ public class ContractResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ContractResource contractResource = new ContractResource(contractService);
+        final ContractResource contractResource = new ContractResource(contractService, contractQueryService);
         this.restContractMockMvc = MockMvcBuilders.standaloneSetup(contractResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -298,6 +305,519 @@ public class ContractResourceIntTest {
             .andExpect(jsonPath("$.expiresAt").value(DEFAULT_EXPIRES_AT.toString()))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()));
     }
+
+    @Test
+    @Transactional
+    public void getAllContractsByUuidIsEqualToSomething() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where uuid equals to DEFAULT_UUID
+        defaultContractShouldBeFound("uuid.equals=" + DEFAULT_UUID);
+
+        // Get all the contractList where uuid equals to UPDATED_UUID
+        defaultContractShouldNotBeFound("uuid.equals=" + UPDATED_UUID);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByUuidIsInShouldWork() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where uuid in DEFAULT_UUID or UPDATED_UUID
+        defaultContractShouldBeFound("uuid.in=" + DEFAULT_UUID + "," + UPDATED_UUID);
+
+        // Get all the contractList where uuid equals to UPDATED_UUID
+        defaultContractShouldNotBeFound("uuid.in=" + UPDATED_UUID);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByUuidIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where uuid is not null
+        defaultContractShouldBeFound("uuid.specified=true");
+
+        // Get all the contractList where uuid is null
+        defaultContractShouldNotBeFound("uuid.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where name equals to DEFAULT_NAME
+        defaultContractShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the contractList where name equals to UPDATED_NAME
+        defaultContractShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultContractShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the contractList where name equals to UPDATED_NAME
+        defaultContractShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where name is not null
+        defaultContractShouldBeFound("name.specified=true");
+
+        // Get all the contractList where name is null
+        defaultContractShouldNotBeFound("name.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsBySubjectIsEqualToSomething() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where subject equals to DEFAULT_SUBJECT
+        defaultContractShouldBeFound("subject.equals=" + DEFAULT_SUBJECT);
+
+        // Get all the contractList where subject equals to UPDATED_SUBJECT
+        defaultContractShouldNotBeFound("subject.equals=" + UPDATED_SUBJECT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsBySubjectIsInShouldWork() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where subject in DEFAULT_SUBJECT or UPDATED_SUBJECT
+        defaultContractShouldBeFound("subject.in=" + DEFAULT_SUBJECT + "," + UPDATED_SUBJECT);
+
+        // Get all the contractList where subject equals to UPDATED_SUBJECT
+        defaultContractShouldNotBeFound("subject.in=" + UPDATED_SUBJECT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsBySubjectIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where subject is not null
+        defaultContractShouldBeFound("subject.specified=true");
+
+        // Get all the contractList where subject is null
+        defaultContractShouldNotBeFound("subject.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByStatusIsEqualToSomething() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where status equals to DEFAULT_STATUS
+        defaultContractShouldBeFound("status.equals=" + DEFAULT_STATUS);
+
+        // Get all the contractList where status equals to UPDATED_STATUS
+        defaultContractShouldNotBeFound("status.equals=" + UPDATED_STATUS);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByStatusIsInShouldWork() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where status in DEFAULT_STATUS or UPDATED_STATUS
+        defaultContractShouldBeFound("status.in=" + DEFAULT_STATUS + "," + UPDATED_STATUS);
+
+        // Get all the contractList where status equals to UPDATED_STATUS
+        defaultContractShouldNotBeFound("status.in=" + UPDATED_STATUS);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByStatusIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where status is not null
+        defaultContractShouldBeFound("status.specified=true");
+
+        // Get all the contractList where status is null
+        defaultContractShouldNotBeFound("status.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByDescriptionIsEqualToSomething() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where description equals to DEFAULT_DESCRIPTION
+        defaultContractShouldBeFound("description.equals=" + DEFAULT_DESCRIPTION);
+
+        // Get all the contractList where description equals to UPDATED_DESCRIPTION
+        defaultContractShouldNotBeFound("description.equals=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByDescriptionIsInShouldWork() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where description in DEFAULT_DESCRIPTION or UPDATED_DESCRIPTION
+        defaultContractShouldBeFound("description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION);
+
+        // Get all the contractList where description equals to UPDATED_DESCRIPTION
+        defaultContractShouldNotBeFound("description.in=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByDescriptionIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where description is not null
+        defaultContractShouldBeFound("description.specified=true");
+
+        // Get all the contractList where description is null
+        defaultContractShouldNotBeFound("description.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByContentIsEqualToSomething() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where content equals to DEFAULT_CONTENT
+        defaultContractShouldBeFound("content.equals=" + DEFAULT_CONTENT);
+
+        // Get all the contractList where content equals to UPDATED_CONTENT
+        defaultContractShouldNotBeFound("content.equals=" + UPDATED_CONTENT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByContentIsInShouldWork() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where content in DEFAULT_CONTENT or UPDATED_CONTENT
+        defaultContractShouldBeFound("content.in=" + DEFAULT_CONTENT + "," + UPDATED_CONTENT);
+
+        // Get all the contractList where content equals to UPDATED_CONTENT
+        defaultContractShouldNotBeFound("content.in=" + UPDATED_CONTENT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByContentIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where content is not null
+        defaultContractShouldBeFound("content.specified=true");
+
+        // Get all the contractList where content is null
+        defaultContractShouldNotBeFound("content.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByRequestAcessIsEqualToSomething() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where requestAcess equals to DEFAULT_REQUEST_ACESS
+        defaultContractShouldBeFound("requestAcess.equals=" + DEFAULT_REQUEST_ACESS);
+
+        // Get all the contractList where requestAcess equals to UPDATED_REQUEST_ACESS
+        defaultContractShouldNotBeFound("requestAcess.equals=" + UPDATED_REQUEST_ACESS);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByRequestAcessIsInShouldWork() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where requestAcess in DEFAULT_REQUEST_ACESS or UPDATED_REQUEST_ACESS
+        defaultContractShouldBeFound("requestAcess.in=" + DEFAULT_REQUEST_ACESS + "," + UPDATED_REQUEST_ACESS);
+
+        // Get all the contractList where requestAcess equals to UPDATED_REQUEST_ACESS
+        defaultContractShouldNotBeFound("requestAcess.in=" + UPDATED_REQUEST_ACESS);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByRequestAcessIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where requestAcess is not null
+        defaultContractShouldBeFound("requestAcess.specified=true");
+
+        // Get all the contractList where requestAcess is null
+        defaultContractShouldNotBeFound("requestAcess.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByLastActivityAtIsEqualToSomething() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where lastActivityAt equals to DEFAULT_LAST_ACTIVITY_AT
+        defaultContractShouldBeFound("lastActivityAt.equals=" + DEFAULT_LAST_ACTIVITY_AT);
+
+        // Get all the contractList where lastActivityAt equals to UPDATED_LAST_ACTIVITY_AT
+        defaultContractShouldNotBeFound("lastActivityAt.equals=" + UPDATED_LAST_ACTIVITY_AT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByLastActivityAtIsInShouldWork() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where lastActivityAt in DEFAULT_LAST_ACTIVITY_AT or UPDATED_LAST_ACTIVITY_AT
+        defaultContractShouldBeFound("lastActivityAt.in=" + DEFAULT_LAST_ACTIVITY_AT + "," + UPDATED_LAST_ACTIVITY_AT);
+
+        // Get all the contractList where lastActivityAt equals to UPDATED_LAST_ACTIVITY_AT
+        defaultContractShouldNotBeFound("lastActivityAt.in=" + UPDATED_LAST_ACTIVITY_AT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByLastActivityAtIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where lastActivityAt is not null
+        defaultContractShouldBeFound("lastActivityAt.specified=true");
+
+        // Get all the contractList where lastActivityAt is null
+        defaultContractShouldNotBeFound("lastActivityAt.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByLastActivityAtIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where lastActivityAt greater than or equals to DEFAULT_LAST_ACTIVITY_AT
+        defaultContractShouldBeFound("lastActivityAt.greaterOrEqualThan=" + DEFAULT_LAST_ACTIVITY_AT);
+
+        // Get all the contractList where lastActivityAt greater than or equals to UPDATED_LAST_ACTIVITY_AT
+        defaultContractShouldNotBeFound("lastActivityAt.greaterOrEqualThan=" + UPDATED_LAST_ACTIVITY_AT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByLastActivityAtIsLessThanSomething() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where lastActivityAt less than or equals to DEFAULT_LAST_ACTIVITY_AT
+        defaultContractShouldNotBeFound("lastActivityAt.lessThan=" + DEFAULT_LAST_ACTIVITY_AT);
+
+        // Get all the contractList where lastActivityAt less than or equals to UPDATED_LAST_ACTIVITY_AT
+        defaultContractShouldBeFound("lastActivityAt.lessThan=" + UPDATED_LAST_ACTIVITY_AT);
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllContractsByExpiresAtIsEqualToSomething() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where expiresAt equals to DEFAULT_EXPIRES_AT
+        defaultContractShouldBeFound("expiresAt.equals=" + DEFAULT_EXPIRES_AT);
+
+        // Get all the contractList where expiresAt equals to UPDATED_EXPIRES_AT
+        defaultContractShouldNotBeFound("expiresAt.equals=" + UPDATED_EXPIRES_AT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByExpiresAtIsInShouldWork() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where expiresAt in DEFAULT_EXPIRES_AT or UPDATED_EXPIRES_AT
+        defaultContractShouldBeFound("expiresAt.in=" + DEFAULT_EXPIRES_AT + "," + UPDATED_EXPIRES_AT);
+
+        // Get all the contractList where expiresAt equals to UPDATED_EXPIRES_AT
+        defaultContractShouldNotBeFound("expiresAt.in=" + UPDATED_EXPIRES_AT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByExpiresAtIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where expiresAt is not null
+        defaultContractShouldBeFound("expiresAt.specified=true");
+
+        // Get all the contractList where expiresAt is null
+        defaultContractShouldNotBeFound("expiresAt.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByExpiresAtIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where expiresAt greater than or equals to DEFAULT_EXPIRES_AT
+        defaultContractShouldBeFound("expiresAt.greaterOrEqualThan=" + DEFAULT_EXPIRES_AT);
+
+        // Get all the contractList where expiresAt greater than or equals to UPDATED_EXPIRES_AT
+        defaultContractShouldNotBeFound("expiresAt.greaterOrEqualThan=" + UPDATED_EXPIRES_AT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByExpiresAtIsLessThanSomething() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where expiresAt less than or equals to DEFAULT_EXPIRES_AT
+        defaultContractShouldNotBeFound("expiresAt.lessThan=" + DEFAULT_EXPIRES_AT);
+
+        // Get all the contractList where expiresAt less than or equals to UPDATED_EXPIRES_AT
+        defaultContractShouldBeFound("expiresAt.lessThan=" + UPDATED_EXPIRES_AT);
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllContractsByTypeIsEqualToSomething() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where type equals to DEFAULT_TYPE
+        defaultContractShouldBeFound("type.equals=" + DEFAULT_TYPE);
+
+        // Get all the contractList where type equals to UPDATED_TYPE
+        defaultContractShouldNotBeFound("type.equals=" + UPDATED_TYPE);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByTypeIsInShouldWork() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where type in DEFAULT_TYPE or UPDATED_TYPE
+        defaultContractShouldBeFound("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE);
+
+        // Get all the contractList where type equals to UPDATED_TYPE
+        defaultContractShouldNotBeFound("type.in=" + UPDATED_TYPE);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByTypeIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        contractRepository.saveAndFlush(contract);
+
+        // Get all the contractList where type is not null
+        defaultContractShouldBeFound("type.specified=true");
+
+        // Get all the contractList where type is null
+        defaultContractShouldNotBeFound("type.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllContractsByRequestsIsEqualToSomething() throws Exception {
+        // Initialize the database
+        SignatureRequest requests = SignatureRequestResourceIntTest.createEntity(em);
+        em.persist(requests);
+        em.flush();
+        contract.addRequests(requests);
+        contractRepository.saveAndFlush(contract);
+        Long requestsId = requests.getId();
+
+        // Get all the contractList where requests equals to requestsId
+        defaultContractShouldBeFound("requestsId.equals=" + requestsId);
+
+        // Get all the contractList where requests equals to requestsId + 1
+        defaultContractShouldNotBeFound("requestsId.equals=" + (requestsId + 1));
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllContractsByProjectIsEqualToSomething() throws Exception {
+        // Initialize the database
+        Project project = ProjectResourceIntTest.createEntity(em);
+        em.persist(project);
+        em.flush();
+        contract.setProject(project);
+        contractRepository.saveAndFlush(contract);
+        Long projectId = project.getId();
+
+        // Get all the contractList where project equals to projectId
+        defaultContractShouldBeFound("projectId.equals=" + projectId);
+
+        // Get all the contractList where project equals to projectId + 1
+        defaultContractShouldNotBeFound("projectId.equals=" + (projectId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned
+     */
+    private void defaultContractShouldBeFound(String filter) throws Exception {
+        restContractMockMvc.perform(get("/api/contracts?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(contract.getId().intValue())))
+            .andExpect(jsonPath("$.[*].uuid").value(hasItem(DEFAULT_UUID.toString())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
+            .andExpect(jsonPath("$.[*].subject").value(hasItem(DEFAULT_SUBJECT.toString())))
+            .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())))
+            .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT.toString())))
+            .andExpect(jsonPath("$.[*].requestAcess").value(hasItem(DEFAULT_REQUEST_ACESS.booleanValue())))
+            .andExpect(jsonPath("$.[*].lastActivityAt").value(hasItem(DEFAULT_LAST_ACTIVITY_AT.toString())))
+            .andExpect(jsonPath("$.[*].expiresAt").value(hasItem(DEFAULT_EXPIRES_AT.toString())))
+            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned
+     */
+    private void defaultContractShouldNotBeFound(String filter) throws Exception {
+        restContractMockMvc.perform(get("/api/contracts?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+    }
+
     @Test
     @Transactional
     public void getNonExistingContract() throws Exception {

@@ -6,6 +6,8 @@ import com.lagab.cmanager.service.WorkspaceService;
 import com.lagab.cmanager.web.rest.errors.BadRequestAlertException;
 import com.lagab.cmanager.web.rest.util.HeaderUtil;
 import com.lagab.cmanager.web.rest.util.PaginationUtil;
+import com.lagab.cmanager.service.dto.WorkspaceCriteria;
+import com.lagab.cmanager.service.WorkspaceQueryService;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +38,11 @@ public class WorkspaceResource {
 
     private final WorkspaceService workspaceService;
 
-    public WorkspaceResource(WorkspaceService workspaceService) {
+    private final WorkspaceQueryService workspaceQueryService;
+
+    public WorkspaceResource(WorkspaceService workspaceService, WorkspaceQueryService workspaceQueryService) {
         this.workspaceService = workspaceService;
+        this.workspaceQueryService = workspaceQueryService;
     }
 
     /**
@@ -86,13 +91,14 @@ public class WorkspaceResource {
      * GET  /workspaces : get all the workspaces.
      *
      * @param pageable the pagination information
+     * @param criteria the criterias which the requested entities should match
      * @return the ResponseEntity with status 200 (OK) and the list of workspaces in body
      */
     @GetMapping("/workspaces")
     @Timed
-    public ResponseEntity<List<Workspace>> getAllWorkspaces(Pageable pageable) {
-        log.debug("REST request to get a page of Workspaces");
-        Page<Workspace> page = workspaceService.findAll(pageable);
+    public ResponseEntity<List<Workspace>> getAllWorkspaces(WorkspaceCriteria criteria, Pageable pageable) {
+        log.debug("REST request to get Workspaces by criteria: {}", criteria);
+        Page<Workspace> page = workspaceQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/workspaces");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

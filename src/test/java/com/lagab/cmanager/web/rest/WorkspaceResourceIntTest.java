@@ -3,9 +3,12 @@ package com.lagab.cmanager.web.rest;
 import com.lagab.cmanager.CmanagerApp;
 
 import com.lagab.cmanager.domain.Workspace;
+import com.lagab.cmanager.domain.Project;
 import com.lagab.cmanager.repository.WorkspaceRepository;
 import com.lagab.cmanager.service.WorkspaceService;
 import com.lagab.cmanager.web.rest.errors.ExceptionTranslator;
+import com.lagab.cmanager.service.dto.WorkspaceCriteria;
+import com.lagab.cmanager.service.WorkspaceQueryService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -68,6 +71,9 @@ public class WorkspaceResourceIntTest {
     private WorkspaceService workspaceService;
 
     @Autowired
+    private WorkspaceQueryService workspaceQueryService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -86,7 +92,7 @@ public class WorkspaceResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final WorkspaceResource workspaceResource = new WorkspaceResource(workspaceService);
+        final WorkspaceResource workspaceResource = new WorkspaceResource(workspaceService, workspaceQueryService);
         this.restWorkspaceMockMvc = MockMvcBuilders.standaloneSetup(workspaceResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -232,6 +238,286 @@ public class WorkspaceResourceIntTest {
             .andExpect(jsonPath("$.requestAcess").value(DEFAULT_REQUEST_ACESS.booleanValue()))
             .andExpect(jsonPath("$.visibility").value(DEFAULT_VISIBILITY.toString()));
     }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where name equals to DEFAULT_NAME
+        defaultWorkspaceShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the workspaceList where name equals to UPDATED_NAME
+        defaultWorkspaceShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultWorkspaceShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the workspaceList where name equals to UPDATED_NAME
+        defaultWorkspaceShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where name is not null
+        defaultWorkspaceShouldBeFound("name.specified=true");
+
+        // Get all the workspaceList where name is null
+        defaultWorkspaceShouldNotBeFound("name.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesBySlugIsEqualToSomething() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where slug equals to DEFAULT_SLUG
+        defaultWorkspaceShouldBeFound("slug.equals=" + DEFAULT_SLUG);
+
+        // Get all the workspaceList where slug equals to UPDATED_SLUG
+        defaultWorkspaceShouldNotBeFound("slug.equals=" + UPDATED_SLUG);
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesBySlugIsInShouldWork() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where slug in DEFAULT_SLUG or UPDATED_SLUG
+        defaultWorkspaceShouldBeFound("slug.in=" + DEFAULT_SLUG + "," + UPDATED_SLUG);
+
+        // Get all the workspaceList where slug equals to UPDATED_SLUG
+        defaultWorkspaceShouldNotBeFound("slug.in=" + UPDATED_SLUG);
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesBySlugIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where slug is not null
+        defaultWorkspaceShouldBeFound("slug.specified=true");
+
+        // Get all the workspaceList where slug is null
+        defaultWorkspaceShouldNotBeFound("slug.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByDescriptionIsEqualToSomething() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where description equals to DEFAULT_DESCRIPTION
+        defaultWorkspaceShouldBeFound("description.equals=" + DEFAULT_DESCRIPTION);
+
+        // Get all the workspaceList where description equals to UPDATED_DESCRIPTION
+        defaultWorkspaceShouldNotBeFound("description.equals=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByDescriptionIsInShouldWork() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where description in DEFAULT_DESCRIPTION or UPDATED_DESCRIPTION
+        defaultWorkspaceShouldBeFound("description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION);
+
+        // Get all the workspaceList where description equals to UPDATED_DESCRIPTION
+        defaultWorkspaceShouldNotBeFound("description.in=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByDescriptionIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where description is not null
+        defaultWorkspaceShouldBeFound("description.specified=true");
+
+        // Get all the workspaceList where description is null
+        defaultWorkspaceShouldNotBeFound("description.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByAvatarIsEqualToSomething() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where avatar equals to DEFAULT_AVATAR
+        defaultWorkspaceShouldBeFound("avatar.equals=" + DEFAULT_AVATAR);
+
+        // Get all the workspaceList where avatar equals to UPDATED_AVATAR
+        defaultWorkspaceShouldNotBeFound("avatar.equals=" + UPDATED_AVATAR);
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByAvatarIsInShouldWork() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where avatar in DEFAULT_AVATAR or UPDATED_AVATAR
+        defaultWorkspaceShouldBeFound("avatar.in=" + DEFAULT_AVATAR + "," + UPDATED_AVATAR);
+
+        // Get all the workspaceList where avatar equals to UPDATED_AVATAR
+        defaultWorkspaceShouldNotBeFound("avatar.in=" + UPDATED_AVATAR);
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByAvatarIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where avatar is not null
+        defaultWorkspaceShouldBeFound("avatar.specified=true");
+
+        // Get all the workspaceList where avatar is null
+        defaultWorkspaceShouldNotBeFound("avatar.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByRequestAcessIsEqualToSomething() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where requestAcess equals to DEFAULT_REQUEST_ACESS
+        defaultWorkspaceShouldBeFound("requestAcess.equals=" + DEFAULT_REQUEST_ACESS);
+
+        // Get all the workspaceList where requestAcess equals to UPDATED_REQUEST_ACESS
+        defaultWorkspaceShouldNotBeFound("requestAcess.equals=" + UPDATED_REQUEST_ACESS);
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByRequestAcessIsInShouldWork() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where requestAcess in DEFAULT_REQUEST_ACESS or UPDATED_REQUEST_ACESS
+        defaultWorkspaceShouldBeFound("requestAcess.in=" + DEFAULT_REQUEST_ACESS + "," + UPDATED_REQUEST_ACESS);
+
+        // Get all the workspaceList where requestAcess equals to UPDATED_REQUEST_ACESS
+        defaultWorkspaceShouldNotBeFound("requestAcess.in=" + UPDATED_REQUEST_ACESS);
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByRequestAcessIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where requestAcess is not null
+        defaultWorkspaceShouldBeFound("requestAcess.specified=true");
+
+        // Get all the workspaceList where requestAcess is null
+        defaultWorkspaceShouldNotBeFound("requestAcess.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByVisibilityIsEqualToSomething() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where visibility equals to DEFAULT_VISIBILITY
+        defaultWorkspaceShouldBeFound("visibility.equals=" + DEFAULT_VISIBILITY);
+
+        // Get all the workspaceList where visibility equals to UPDATED_VISIBILITY
+        defaultWorkspaceShouldNotBeFound("visibility.equals=" + UPDATED_VISIBILITY);
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByVisibilityIsInShouldWork() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where visibility in DEFAULT_VISIBILITY or UPDATED_VISIBILITY
+        defaultWorkspaceShouldBeFound("visibility.in=" + DEFAULT_VISIBILITY + "," + UPDATED_VISIBILITY);
+
+        // Get all the workspaceList where visibility equals to UPDATED_VISIBILITY
+        defaultWorkspaceShouldNotBeFound("visibility.in=" + UPDATED_VISIBILITY);
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByVisibilityIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        workspaceRepository.saveAndFlush(workspace);
+
+        // Get all the workspaceList where visibility is not null
+        defaultWorkspaceShouldBeFound("visibility.specified=true");
+
+        // Get all the workspaceList where visibility is null
+        defaultWorkspaceShouldNotBeFound("visibility.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllWorkspacesByProjectsIsEqualToSomething() throws Exception {
+        // Initialize the database
+        Project projects = ProjectResourceIntTest.createEntity(em);
+        em.persist(projects);
+        em.flush();
+        workspace.addProjects(projects);
+        workspaceRepository.saveAndFlush(workspace);
+        Long projectsId = projects.getId();
+
+        // Get all the workspaceList where projects equals to projectsId
+        defaultWorkspaceShouldBeFound("projectsId.equals=" + projectsId);
+
+        // Get all the workspaceList where projects equals to projectsId + 1
+        defaultWorkspaceShouldNotBeFound("projectsId.equals=" + (projectsId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned
+     */
+    private void defaultWorkspaceShouldBeFound(String filter) throws Exception {
+        restWorkspaceMockMvc.perform(get("/api/workspaces?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(workspace.getId().intValue())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
+            .andExpect(jsonPath("$.[*].slug").value(hasItem(DEFAULT_SLUG.toString())))
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())))
+            .andExpect(jsonPath("$.[*].avatar").value(hasItem(DEFAULT_AVATAR.toString())))
+            .andExpect(jsonPath("$.[*].requestAcess").value(hasItem(DEFAULT_REQUEST_ACESS.booleanValue())))
+            .andExpect(jsonPath("$.[*].visibility").value(hasItem(DEFAULT_VISIBILITY.toString())));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned
+     */
+    private void defaultWorkspaceShouldNotBeFound(String filter) throws Exception {
+        restWorkspaceMockMvc.perform(get("/api/workspaces?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+    }
+
     @Test
     @Transactional
     public void getNonExistingWorkspace() throws Exception {

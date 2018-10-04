@@ -6,6 +6,8 @@ import com.lagab.cmanager.service.AttachmentService;
 import com.lagab.cmanager.web.rest.errors.BadRequestAlertException;
 import com.lagab.cmanager.web.rest.util.HeaderUtil;
 import com.lagab.cmanager.web.rest.util.PaginationUtil;
+import com.lagab.cmanager.service.dto.AttachmentCriteria;
+import com.lagab.cmanager.service.AttachmentQueryService;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +38,11 @@ public class AttachmentResource {
 
     private final AttachmentService attachmentService;
 
-    public AttachmentResource(AttachmentService attachmentService) {
+    private final AttachmentQueryService attachmentQueryService;
+
+    public AttachmentResource(AttachmentService attachmentService, AttachmentQueryService attachmentQueryService) {
         this.attachmentService = attachmentService;
+        this.attachmentQueryService = attachmentQueryService;
     }
 
     /**
@@ -86,13 +91,14 @@ public class AttachmentResource {
      * GET  /attachments : get all the attachments.
      *
      * @param pageable the pagination information
+     * @param criteria the criterias which the requested entities should match
      * @return the ResponseEntity with status 200 (OK) and the list of attachments in body
      */
     @GetMapping("/attachments")
     @Timed
-    public ResponseEntity<List<Attachment>> getAllAttachments(Pageable pageable) {
-        log.debug("REST request to get a page of Attachments");
-        Page<Attachment> page = attachmentService.findAll(pageable);
+    public ResponseEntity<List<Attachment>> getAllAttachments(AttachmentCriteria criteria, Pageable pageable) {
+        log.debug("REST request to get Attachments by criteria: {}", criteria);
+        Page<Attachment> page = attachmentQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/attachments");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

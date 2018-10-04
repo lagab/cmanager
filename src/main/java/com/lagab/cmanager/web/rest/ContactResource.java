@@ -6,6 +6,8 @@ import com.lagab.cmanager.service.ContactService;
 import com.lagab.cmanager.web.rest.errors.BadRequestAlertException;
 import com.lagab.cmanager.web.rest.util.HeaderUtil;
 import com.lagab.cmanager.web.rest.util.PaginationUtil;
+import com.lagab.cmanager.service.dto.ContactCriteria;
+import com.lagab.cmanager.service.ContactQueryService;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +38,11 @@ public class ContactResource {
 
     private final ContactService contactService;
 
-    public ContactResource(ContactService contactService) {
+    private final ContactQueryService contactQueryService;
+
+    public ContactResource(ContactService contactService, ContactQueryService contactQueryService) {
         this.contactService = contactService;
+        this.contactQueryService = contactQueryService;
     }
 
     /**
@@ -86,13 +91,14 @@ public class ContactResource {
      * GET  /contacts : get all the contacts.
      *
      * @param pageable the pagination information
+     * @param criteria the criterias which the requested entities should match
      * @return the ResponseEntity with status 200 (OK) and the list of contacts in body
      */
     @GetMapping("/contacts")
     @Timed
-    public ResponseEntity<List<Contact>> getAllContacts(Pageable pageable) {
-        log.debug("REST request to get a page of Contacts");
-        Page<Contact> page = contactService.findAll(pageable);
+    public ResponseEntity<List<Contact>> getAllContacts(ContactCriteria criteria, Pageable pageable) {
+        log.debug("REST request to get Contacts by criteria: {}", criteria);
+        Page<Contact> page = contactQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/contacts");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

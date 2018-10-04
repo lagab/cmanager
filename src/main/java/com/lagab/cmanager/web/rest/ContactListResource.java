@@ -6,6 +6,8 @@ import com.lagab.cmanager.service.ContactListService;
 import com.lagab.cmanager.web.rest.errors.BadRequestAlertException;
 import com.lagab.cmanager.web.rest.util.HeaderUtil;
 import com.lagab.cmanager.web.rest.util.PaginationUtil;
+import com.lagab.cmanager.service.dto.ContactListCriteria;
+import com.lagab.cmanager.service.ContactListQueryService;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +38,11 @@ public class ContactListResource {
 
     private final ContactListService contactListService;
 
-    public ContactListResource(ContactListService contactListService) {
+    private final ContactListQueryService contactListQueryService;
+
+    public ContactListResource(ContactListService contactListService, ContactListQueryService contactListQueryService) {
         this.contactListService = contactListService;
+        this.contactListQueryService = contactListQueryService;
     }
 
     /**
@@ -86,13 +91,14 @@ public class ContactListResource {
      * GET  /contact-lists : get all the contactLists.
      *
      * @param pageable the pagination information
+     * @param criteria the criterias which the requested entities should match
      * @return the ResponseEntity with status 200 (OK) and the list of contactLists in body
      */
     @GetMapping("/contact-lists")
     @Timed
-    public ResponseEntity<List<ContactList>> getAllContactLists(Pageable pageable) {
-        log.debug("REST request to get a page of ContactLists");
-        Page<ContactList> page = contactListService.findAll(pageable);
+    public ResponseEntity<List<ContactList>> getAllContactLists(ContactListCriteria criteria, Pageable pageable) {
+        log.debug("REST request to get ContactLists by criteria: {}", criteria);
+        Page<ContactList> page = contactListQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/contact-lists");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

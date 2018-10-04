@@ -3,9 +3,13 @@ package com.lagab.cmanager.web.rest;
 import com.lagab.cmanager.CmanagerApp;
 
 import com.lagab.cmanager.domain.ContactFolder;
+import com.lagab.cmanager.domain.ContactList;
+import com.lagab.cmanager.domain.Project;
 import com.lagab.cmanager.repository.ContactFolderRepository;
 import com.lagab.cmanager.service.ContactFolderService;
 import com.lagab.cmanager.web.rest.errors.ExceptionTranslator;
+import com.lagab.cmanager.service.dto.ContactFolderCriteria;
+import com.lagab.cmanager.service.ContactFolderQueryService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,6 +56,9 @@ public class ContactFolderResourceIntTest {
     private ContactFolderService contactFolderService;
 
     @Autowired
+    private ContactFolderQueryService contactFolderQueryService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -70,7 +77,7 @@ public class ContactFolderResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ContactFolderResource contactFolderResource = new ContactFolderResource(contactFolderService);
+        final ContactFolderResource contactFolderResource = new ContactFolderResource(contactFolderService, contactFolderQueryService);
         this.restContactFolderMockMvc = MockMvcBuilders.standaloneSetup(contactFolderResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -178,6 +185,105 @@ public class ContactFolderResourceIntTest {
             .andExpect(jsonPath("$.id").value(contactFolder.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()));
     }
+
+    @Test
+    @Transactional
+    public void getAllContactFoldersByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        contactFolderRepository.saveAndFlush(contactFolder);
+
+        // Get all the contactFolderList where name equals to DEFAULT_NAME
+        defaultContactFolderShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the contactFolderList where name equals to UPDATED_NAME
+        defaultContactFolderShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContactFoldersByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        contactFolderRepository.saveAndFlush(contactFolder);
+
+        // Get all the contactFolderList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultContactFolderShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the contactFolderList where name equals to UPDATED_NAME
+        defaultContactFolderShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllContactFoldersByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        contactFolderRepository.saveAndFlush(contactFolder);
+
+        // Get all the contactFolderList where name is not null
+        defaultContactFolderShouldBeFound("name.specified=true");
+
+        // Get all the contactFolderList where name is null
+        defaultContactFolderShouldNotBeFound("name.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllContactFoldersByListsIsEqualToSomething() throws Exception {
+        // Initialize the database
+        ContactList lists = ContactListResourceIntTest.createEntity(em);
+        em.persist(lists);
+        em.flush();
+        contactFolder.addLists(lists);
+        contactFolderRepository.saveAndFlush(contactFolder);
+        Long listsId = lists.getId();
+
+        // Get all the contactFolderList where lists equals to listsId
+        defaultContactFolderShouldBeFound("listsId.equals=" + listsId);
+
+        // Get all the contactFolderList where lists equals to listsId + 1
+        defaultContactFolderShouldNotBeFound("listsId.equals=" + (listsId + 1));
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllContactFoldersByProjectIsEqualToSomething() throws Exception {
+        // Initialize the database
+        Project project = ProjectResourceIntTest.createEntity(em);
+        em.persist(project);
+        em.flush();
+        contactFolder.setProject(project);
+        contactFolderRepository.saveAndFlush(contactFolder);
+        Long projectId = project.getId();
+
+        // Get all the contactFolderList where project equals to projectId
+        defaultContactFolderShouldBeFound("projectId.equals=" + projectId);
+
+        // Get all the contactFolderList where project equals to projectId + 1
+        defaultContactFolderShouldNotBeFound("projectId.equals=" + (projectId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned
+     */
+    private void defaultContactFolderShouldBeFound(String filter) throws Exception {
+        restContactFolderMockMvc.perform(get("/api/contact-folders?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(contactFolder.getId().intValue())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned
+     */
+    private void defaultContactFolderShouldNotBeFound(String filter) throws Exception {
+        restContactFolderMockMvc.perform(get("/api/contact-folders?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+    }
+
     @Test
     @Transactional
     public void getNonExistingContactFolder() throws Exception {

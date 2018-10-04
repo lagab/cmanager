@@ -6,6 +6,8 @@ import com.lagab.cmanager.service.SignatureService;
 import com.lagab.cmanager.web.rest.errors.BadRequestAlertException;
 import com.lagab.cmanager.web.rest.util.HeaderUtil;
 import com.lagab.cmanager.web.rest.util.PaginationUtil;
+import com.lagab.cmanager.service.dto.SignatureCriteria;
+import com.lagab.cmanager.service.SignatureQueryService;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +38,11 @@ public class SignatureResource {
 
     private final SignatureService signatureService;
 
-    public SignatureResource(SignatureService signatureService) {
+    private final SignatureQueryService signatureQueryService;
+
+    public SignatureResource(SignatureService signatureService, SignatureQueryService signatureQueryService) {
         this.signatureService = signatureService;
+        this.signatureQueryService = signatureQueryService;
     }
 
     /**
@@ -86,13 +91,14 @@ public class SignatureResource {
      * GET  /signatures : get all the signatures.
      *
      * @param pageable the pagination information
+     * @param criteria the criterias which the requested entities should match
      * @return the ResponseEntity with status 200 (OK) and the list of signatures in body
      */
     @GetMapping("/signatures")
     @Timed
-    public ResponseEntity<List<Signature>> getAllSignatures(Pageable pageable) {
-        log.debug("REST request to get a page of Signatures");
-        Page<Signature> page = signatureService.findAll(pageable);
+    public ResponseEntity<List<Signature>> getAllSignatures(SignatureCriteria criteria, Pageable pageable) {
+        log.debug("REST request to get Signatures by criteria: {}", criteria);
+        Page<Signature> page = signatureQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/signatures");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

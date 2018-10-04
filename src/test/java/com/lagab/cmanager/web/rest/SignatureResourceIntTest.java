@@ -3,9 +3,12 @@ package com.lagab.cmanager.web.rest;
 import com.lagab.cmanager.CmanagerApp;
 
 import com.lagab.cmanager.domain.Signature;
+import com.lagab.cmanager.domain.SignatureRequest;
 import com.lagab.cmanager.repository.SignatureRepository;
 import com.lagab.cmanager.service.SignatureService;
 import com.lagab.cmanager.web.rest.errors.ExceptionTranslator;
+import com.lagab.cmanager.service.dto.SignatureCriteria;
+import com.lagab.cmanager.service.SignatureQueryService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -73,6 +76,9 @@ public class SignatureResourceIntTest {
     private SignatureService signatureService;
 
     @Autowired
+    private SignatureQueryService signatureQueryService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -91,7 +97,7 @@ public class SignatureResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final SignatureResource signatureResource = new SignatureResource(signatureService);
+        final SignatureResource signatureResource = new SignatureResource(signatureService, signatureQueryService);
         this.restSignatureMockMvc = MockMvcBuilders.standaloneSetup(signatureResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -295,6 +301,407 @@ public class SignatureResourceIntTest {
             .andExpect(jsonPath("$.lastViewedAt").value(DEFAULT_LAST_VIEWED_AT.toString()))
             .andExpect(jsonPath("$.lastRemindedAt").value(DEFAULT_LAST_REMINDED_AT.toString()));
     }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByEmailIsEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where email equals to DEFAULT_EMAIL
+        defaultSignatureShouldBeFound("email.equals=" + DEFAULT_EMAIL);
+
+        // Get all the signatureList where email equals to UPDATED_EMAIL
+        defaultSignatureShouldNotBeFound("email.equals=" + UPDATED_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByEmailIsInShouldWork() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where email in DEFAULT_EMAIL or UPDATED_EMAIL
+        defaultSignatureShouldBeFound("email.in=" + DEFAULT_EMAIL + "," + UPDATED_EMAIL);
+
+        // Get all the signatureList where email equals to UPDATED_EMAIL
+        defaultSignatureShouldNotBeFound("email.in=" + UPDATED_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByEmailIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where email is not null
+        defaultSignatureShouldBeFound("email.specified=true");
+
+        // Get all the signatureList where email is null
+        defaultSignatureShouldNotBeFound("email.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where name equals to DEFAULT_NAME
+        defaultSignatureShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the signatureList where name equals to UPDATED_NAME
+        defaultSignatureShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultSignatureShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the signatureList where name equals to UPDATED_NAME
+        defaultSignatureShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where name is not null
+        defaultSignatureShouldBeFound("name.specified=true");
+
+        // Get all the signatureList where name is null
+        defaultSignatureShouldNotBeFound("name.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByOrderIsEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where order equals to DEFAULT_ORDER
+        defaultSignatureShouldBeFound("order.equals=" + DEFAULT_ORDER);
+
+        // Get all the signatureList where order equals to UPDATED_ORDER
+        defaultSignatureShouldNotBeFound("order.equals=" + UPDATED_ORDER);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByOrderIsInShouldWork() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where order in DEFAULT_ORDER or UPDATED_ORDER
+        defaultSignatureShouldBeFound("order.in=" + DEFAULT_ORDER + "," + UPDATED_ORDER);
+
+        // Get all the signatureList where order equals to UPDATED_ORDER
+        defaultSignatureShouldNotBeFound("order.in=" + UPDATED_ORDER);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByOrderIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where order is not null
+        defaultSignatureShouldBeFound("order.specified=true");
+
+        // Get all the signatureList where order is null
+        defaultSignatureShouldNotBeFound("order.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByOrderIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where order greater than or equals to DEFAULT_ORDER
+        defaultSignatureShouldBeFound("order.greaterOrEqualThan=" + DEFAULT_ORDER);
+
+        // Get all the signatureList where order greater than or equals to UPDATED_ORDER
+        defaultSignatureShouldNotBeFound("order.greaterOrEqualThan=" + UPDATED_ORDER);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByOrderIsLessThanSomething() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where order less than or equals to DEFAULT_ORDER
+        defaultSignatureShouldNotBeFound("order.lessThan=" + DEFAULT_ORDER);
+
+        // Get all the signatureList where order less than or equals to UPDATED_ORDER
+        defaultSignatureShouldBeFound("order.lessThan=" + UPDATED_ORDER);
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByStatusIsEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where status equals to DEFAULT_STATUS
+        defaultSignatureShouldBeFound("status.equals=" + DEFAULT_STATUS);
+
+        // Get all the signatureList where status equals to UPDATED_STATUS
+        defaultSignatureShouldNotBeFound("status.equals=" + UPDATED_STATUS);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByStatusIsInShouldWork() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where status in DEFAULT_STATUS or UPDATED_STATUS
+        defaultSignatureShouldBeFound("status.in=" + DEFAULT_STATUS + "," + UPDATED_STATUS);
+
+        // Get all the signatureList where status equals to UPDATED_STATUS
+        defaultSignatureShouldNotBeFound("status.in=" + UPDATED_STATUS);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByStatusIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where status is not null
+        defaultSignatureShouldBeFound("status.specified=true");
+
+        // Get all the signatureList where status is null
+        defaultSignatureShouldNotBeFound("status.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByDeclineReasonIsEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where declineReason equals to DEFAULT_DECLINE_REASON
+        defaultSignatureShouldBeFound("declineReason.equals=" + DEFAULT_DECLINE_REASON);
+
+        // Get all the signatureList where declineReason equals to UPDATED_DECLINE_REASON
+        defaultSignatureShouldNotBeFound("declineReason.equals=" + UPDATED_DECLINE_REASON);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByDeclineReasonIsInShouldWork() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where declineReason in DEFAULT_DECLINE_REASON or UPDATED_DECLINE_REASON
+        defaultSignatureShouldBeFound("declineReason.in=" + DEFAULT_DECLINE_REASON + "," + UPDATED_DECLINE_REASON);
+
+        // Get all the signatureList where declineReason equals to UPDATED_DECLINE_REASON
+        defaultSignatureShouldNotBeFound("declineReason.in=" + UPDATED_DECLINE_REASON);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByDeclineReasonIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where declineReason is not null
+        defaultSignatureShouldBeFound("declineReason.specified=true");
+
+        // Get all the signatureList where declineReason is null
+        defaultSignatureShouldNotBeFound("declineReason.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByLastViewedAtIsEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where lastViewedAt equals to DEFAULT_LAST_VIEWED_AT
+        defaultSignatureShouldBeFound("lastViewedAt.equals=" + DEFAULT_LAST_VIEWED_AT);
+
+        // Get all the signatureList where lastViewedAt equals to UPDATED_LAST_VIEWED_AT
+        defaultSignatureShouldNotBeFound("lastViewedAt.equals=" + UPDATED_LAST_VIEWED_AT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByLastViewedAtIsInShouldWork() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where lastViewedAt in DEFAULT_LAST_VIEWED_AT or UPDATED_LAST_VIEWED_AT
+        defaultSignatureShouldBeFound("lastViewedAt.in=" + DEFAULT_LAST_VIEWED_AT + "," + UPDATED_LAST_VIEWED_AT);
+
+        // Get all the signatureList where lastViewedAt equals to UPDATED_LAST_VIEWED_AT
+        defaultSignatureShouldNotBeFound("lastViewedAt.in=" + UPDATED_LAST_VIEWED_AT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByLastViewedAtIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where lastViewedAt is not null
+        defaultSignatureShouldBeFound("lastViewedAt.specified=true");
+
+        // Get all the signatureList where lastViewedAt is null
+        defaultSignatureShouldNotBeFound("lastViewedAt.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByLastViewedAtIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where lastViewedAt greater than or equals to DEFAULT_LAST_VIEWED_AT
+        defaultSignatureShouldBeFound("lastViewedAt.greaterOrEqualThan=" + DEFAULT_LAST_VIEWED_AT);
+
+        // Get all the signatureList where lastViewedAt greater than or equals to UPDATED_LAST_VIEWED_AT
+        defaultSignatureShouldNotBeFound("lastViewedAt.greaterOrEqualThan=" + UPDATED_LAST_VIEWED_AT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByLastViewedAtIsLessThanSomething() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where lastViewedAt less than or equals to DEFAULT_LAST_VIEWED_AT
+        defaultSignatureShouldNotBeFound("lastViewedAt.lessThan=" + DEFAULT_LAST_VIEWED_AT);
+
+        // Get all the signatureList where lastViewedAt less than or equals to UPDATED_LAST_VIEWED_AT
+        defaultSignatureShouldBeFound("lastViewedAt.lessThan=" + UPDATED_LAST_VIEWED_AT);
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByLastRemindedAtIsEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where lastRemindedAt equals to DEFAULT_LAST_REMINDED_AT
+        defaultSignatureShouldBeFound("lastRemindedAt.equals=" + DEFAULT_LAST_REMINDED_AT);
+
+        // Get all the signatureList where lastRemindedAt equals to UPDATED_LAST_REMINDED_AT
+        defaultSignatureShouldNotBeFound("lastRemindedAt.equals=" + UPDATED_LAST_REMINDED_AT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByLastRemindedAtIsInShouldWork() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where lastRemindedAt in DEFAULT_LAST_REMINDED_AT or UPDATED_LAST_REMINDED_AT
+        defaultSignatureShouldBeFound("lastRemindedAt.in=" + DEFAULT_LAST_REMINDED_AT + "," + UPDATED_LAST_REMINDED_AT);
+
+        // Get all the signatureList where lastRemindedAt equals to UPDATED_LAST_REMINDED_AT
+        defaultSignatureShouldNotBeFound("lastRemindedAt.in=" + UPDATED_LAST_REMINDED_AT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByLastRemindedAtIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where lastRemindedAt is not null
+        defaultSignatureShouldBeFound("lastRemindedAt.specified=true");
+
+        // Get all the signatureList where lastRemindedAt is null
+        defaultSignatureShouldNotBeFound("lastRemindedAt.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByLastRemindedAtIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where lastRemindedAt greater than or equals to DEFAULT_LAST_REMINDED_AT
+        defaultSignatureShouldBeFound("lastRemindedAt.greaterOrEqualThan=" + DEFAULT_LAST_REMINDED_AT);
+
+        // Get all the signatureList where lastRemindedAt greater than or equals to UPDATED_LAST_REMINDED_AT
+        defaultSignatureShouldNotBeFound("lastRemindedAt.greaterOrEqualThan=" + UPDATED_LAST_REMINDED_AT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByLastRemindedAtIsLessThanSomething() throws Exception {
+        // Initialize the database
+        signatureRepository.saveAndFlush(signature);
+
+        // Get all the signatureList where lastRemindedAt less than or equals to DEFAULT_LAST_REMINDED_AT
+        defaultSignatureShouldNotBeFound("lastRemindedAt.lessThan=" + DEFAULT_LAST_REMINDED_AT);
+
+        // Get all the signatureList where lastRemindedAt less than or equals to UPDATED_LAST_REMINDED_AT
+        defaultSignatureShouldBeFound("lastRemindedAt.lessThan=" + UPDATED_LAST_REMINDED_AT);
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllSignaturesByRequestIsEqualToSomething() throws Exception {
+        // Initialize the database
+        SignatureRequest request = SignatureRequestResourceIntTest.createEntity(em);
+        em.persist(request);
+        em.flush();
+        signature.setRequest(request);
+        signatureRepository.saveAndFlush(signature);
+        Long requestId = request.getId();
+
+        // Get all the signatureList where request equals to requestId
+        defaultSignatureShouldBeFound("requestId.equals=" + requestId);
+
+        // Get all the signatureList where request equals to requestId + 1
+        defaultSignatureShouldNotBeFound("requestId.equals=" + (requestId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned
+     */
+    private void defaultSignatureShouldBeFound(String filter) throws Exception {
+        restSignatureMockMvc.perform(get("/api/signatures?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(signature.getId().intValue())))
+            .andExpect(jsonPath("$.[*].email").value(hasItem(DEFAULT_EMAIL.toString())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
+            .andExpect(jsonPath("$.[*].order").value(hasItem(DEFAULT_ORDER)))
+            .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
+            .andExpect(jsonPath("$.[*].declineReason").value(hasItem(DEFAULT_DECLINE_REASON.toString())))
+            .andExpect(jsonPath("$.[*].lastViewedAt").value(hasItem(DEFAULT_LAST_VIEWED_AT.toString())))
+            .andExpect(jsonPath("$.[*].lastRemindedAt").value(hasItem(DEFAULT_LAST_REMINDED_AT.toString())));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned
+     */
+    private void defaultSignatureShouldNotBeFound(String filter) throws Exception {
+        restSignatureMockMvc.perform(get("/api/signatures?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+    }
+
     @Test
     @Transactional
     public void getNonExistingSignature() throws Exception {
