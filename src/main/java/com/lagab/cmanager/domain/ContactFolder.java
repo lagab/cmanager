@@ -34,6 +34,7 @@ public class ContactFolder extends AbstractAuditingEntity implements Serializabl
     private String name;
 
     @OneToMany(mappedBy = "folder")
+    @JsonIgnoreProperties(value={"folder"})
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<ContactList> lists = new HashSet<>();
 
