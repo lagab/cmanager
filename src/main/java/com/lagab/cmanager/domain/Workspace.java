@@ -1,6 +1,7 @@
 package com.lagab.cmanager.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -52,7 +53,8 @@ public class Workspace extends AbstractAuditingEntity implements Serializable {
     @Column(name = "visibility")
     private Visibility visibility;
 
-    @OneToMany(mappedBy = "workspace")
+    @OneToMany(mappedBy = "workspace",fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("workspace")
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<Project> projects = new HashSet<>();
 
